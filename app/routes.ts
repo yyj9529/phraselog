@@ -74,7 +74,7 @@ export default [
     ]),
     layout("core/layouts/private.layout.tsx", { id: "private-auth" }, [
       ...prefix("/auth", [
-        route(
+      route(
           "/forgot-password/create",
           "features/auth/screens/new-password.tsx",
         ),
