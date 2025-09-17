@@ -1,0 +1,1 @@
+ALTER TABLE "scenes" ADD COLUMN "to_who" text NOT NULL;

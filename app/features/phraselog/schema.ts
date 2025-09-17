@@ -9,6 +9,8 @@ export const scenes = pgTable('scenes', {
     user_id: uuid('user_id').notNull().references(() => profiles.profile_id, { onDelete: 'cascade' }),
     // 사용자가 입력한 핵심 의도
     my_intention: text('my_intention').notNull(),
+    //사용자가 입력한 대화의 대상
+    to_who : text('to_who').notNull(),
     // 사용자가 입력한 대화의 배경
     the_context: text('the_context').notNull(),
     // 사용자가 선택한 뉘앙스 (쉼표로 구분된 문자열 또는 배열 타입)
