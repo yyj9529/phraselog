@@ -56,7 +56,7 @@ export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl w-[95vw] sm:w-full bg-white rounded-2xl border-0 shadow-xl p-0 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl w-[95vw] sm:w-full bg-white text-slate-800 rounded-2xl border-0 shadow-xl p-0 max-h-[90vh] overflow-y-auto">
         {/* Header - Mobile Optimized */}
         <DialogHeader className="p-4 sm:p-10 pb-4 sm:pb-6 sticky top-0 bg-white z-10">
           <div className="flex justify-between items-start">
@@ -92,22 +92,34 @@ export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderMod
               value={intention}
               onChange={(e) => setIntention(e.target.value)}
               placeholder="예: 회의에서 동료의 아이디어에 대해 더 자세한 설명을 요청하고 싶었다"
-              className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-500 text-slate-900"
             />
-          </div>
-
+    </div>
           {/* Context Input */}
-          <div className="space-y-3">
-            <label className="text-sm sm:text-base font-semibold text-slate-800 block">
-              그 말은 누구에게, 어떤 상황에서 필요했나요?
-            </label>
-            <Textarea
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              placeholder="예: 팀 회의에서 상사와 동료들 앞에서, 프로젝트 방향에 대한 논의 중에"
-              className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+                <div className="space-y-3">
+                <label className="text-sm sm:text-base font-semibold text-slate-800 block">
+                  그 말은 누구에게 하려고 했나요?
+                </label>
+                <Textarea
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="예: 팀 회의에서 상사와 동료들 앞에서, 프로젝트 방향에 대한 논의 중에"
+                  className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-500 text-slate-900"
+                />
+            </div>
+
+            {/* Context Input */}
+            <div className="space-y-3">
+              <label className="text-sm sm:text-base font-semibold text-slate-800 block">
+              어떤 상황에서 그말이 하고 싶었나요 ?
+              </label>
+              <Textarea
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                placeholder="예: 팀 회의에서 상사와 동료들 앞에서, 프로젝트 방향에 대한 논의 중에"
+                className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-500 text-slate-900"
+              />
+            </div>
 
           {/* Nuance Selection - Mobile Optimized */}
           <div className="space-y-3">
