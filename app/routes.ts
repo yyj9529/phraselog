@@ -95,6 +95,7 @@ export default [
     ...prefix("/phraselog", [
       index("features/phraselog/screens/home.tsx"),
       route("/learning", "features/phraselog/screens/learning.tsx"),
+      route("/create-scene", "features/phraselog/pages/create-scene.tsx"),
     ]),
   
   ]),
