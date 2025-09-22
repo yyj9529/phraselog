@@ -19,6 +19,7 @@ const nuanceTags = [
 
 export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderModalProps) {
   const [intention, setIntention] = useState("");
+  const [to_who, setToWho] = useState("");
   const [context, setContext] = useState("");
   const [selectedNuances, setSelectedNuances] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +33,7 @@ export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderMod
   };
 
   const handleSubmit = async () => {
-    if (!intention.trim() || !context.trim()) return;
+    if (!intention.trim() || !context.trim() || !to_who.trim()) return;
     
     setIsLoading(true);
     
@@ -40,6 +41,7 @@ export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderMod
       await onSubmit({
         intention: intention.trim(),
         context: context.trim(),
+        to_who: to_who.trim(),
         nuances: selectedNuances.length > 0 ? selectedNuances : undefined,
       });
       
@@ -101,8 +103,8 @@ export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderMod
                   그 말은 누구에게 하려고 했나요?
                 </label>
                 <Textarea
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
+                  value={to_who}
+                  onChange={(e) => setToWho(e.target.value)}
                   placeholder="예: 팀 회의에서 상사와 동료들 앞에서, 프로젝트 방향에 대한 논의 중에"
                   className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-500 text-slate-900"
                 />

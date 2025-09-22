@@ -5,6 +5,8 @@
 /build/
 .env
 
+.cursorrules
+
 # Playwright
 node_modules/
 /test-results/
