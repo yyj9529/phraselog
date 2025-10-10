@@ -25,7 +25,7 @@ import makeServerClient from "~/core/lib/supa-client.server";
  * Add more providers as you enable them in your Supabase dashboard
  */
 const paramsSchema = z.object({
-  provider: z.enum(["github", "kakao"]),
+  provider: z.enum(["github", "kakao","google"]),
 });
 
 /**
@@ -42,6 +42,8 @@ const paramsSchema = z.object({
  * @returns Redirect to the provider's auth page or error response
  */
 export async function loader({ params, request }: Route.LoaderArgs) {
+  console.log("request...............",request);
+  console.log("params...............",params);
   // Validate the provider parameter
   const { error, success, data: parsedParams } = paramsSchema.safeParse(params);
   if (!success) {

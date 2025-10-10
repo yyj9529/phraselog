@@ -14,7 +14,10 @@ interface SceneBuilderModalProps {
 
 const nuanceTags = [
   "#친절하게", "#정중하게", "#격식있게", "#캐주얼하게", 
-  "#확신있게", "#조심스럽게", "#감사하며", "#사과하며"
+  "#확신있게", "#조심스럽게", "#감사하며", "#사과하며",
+  "#회를내면서","#장난스럽게","#감동적이게","#부끄럽게",
+  "#속닥거리면서","#침착하게","#신중하게","#부드럽게",
+  "#명확하게","#직설적이게","#당당하게","#자신있게",
 ];
 
 export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderModalProps) {
@@ -105,7 +108,7 @@ export function SceneBuilderModal({ isOpen, onClose, onSubmit }: SceneBuilderMod
                 <Textarea
                   value={to_who}
                   onChange={(e) => setToWho(e.target.value)}
-                  placeholder="예: 팀 회의에서 상사와 동료들 앞에서, 프로젝트 방향에 대한 논의 중에"
+                  placeholder="예: 직장동료에게"
                   className="min-h-[80px] sm:min-h-[80px] bg-slate-50 border-slate-200 rounded-lg text-sm sm:text-base resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-500 text-slate-900"
                 />
             </div>

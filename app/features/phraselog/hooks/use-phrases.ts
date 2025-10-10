@@ -12,6 +12,7 @@ export interface Phrase {
 export interface SceneData {
   intention: string;
   context: string;
+  to_who: string;
   nuances?: string[];
 }
 
@@ -61,22 +62,51 @@ export function usePhrases() {
     setIsLoading(true);
     setError(null);
     
+    console.log("1.sceneData...............",sceneData);
     try {
-      const generatedPhrase = await mockAIService.generatePhrase(sceneData);
+      // FormData 생성
+      const formData = new FormData();
+      formData.append("intention", sceneData.intention);
+      formData.append("context", sceneData.context);
+      formData.append("to_who", sceneData.to_who);
       
-      const newPhrase: Phrase = {
-        id: Date.now().toString(),
-        phrase: generatedPhrase,
-        context: sceneData.context,
-        intention: sceneData.intention,
-        nuances: sceneData.nuances,
-        createdAt: new Date(),
+      console.log("2.formData...............",formData);
+      // nuances 추가
+      if (sceneData.nuances && sceneData.nuances.length > 0) {
+        sceneData.nuances.forEach(nuance => {
+          formData.append("nuances", nuance);
+        });
+      }
+
+      console.log(".formData...............after append nuances",formData);
+      // 백엔드 API 호출
+      const response = await fetch("/phraselog/create-scene", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate phrase");
+      }
+
+      const newPhrase = await response.json();
+      
+      // 생성된 phrase를 로컬 state에 추가
+      const phrase: Phrase = {
+        id: newPhrase.id,
+        phrase: newPhrase.phrase,
+        context: newPhrase.context,
+        intention: newPhrase.intention,
+        nuances: newPhrase.nuances,
+        createdAt: new Date(newPhrase.createdAt),
       };
       
-      setPhrases(prev => [newPhrase, ...prev]);
-      return newPhrase;
+      setPhrases(prev => [phrase, ...prev]);
+      return phrase;
     } catch (err) {
-      setError("Failed to generate phrase. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Failed to generate phrase. Please try again.";
+      setError(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
@@ -103,8 +133,32 @@ export function usePhrases() {
   };
 }
 
-
-async function callGemini(prompt : string){
+export async function callGemini(prompt : string){
   const apiKey = process.env.GEMINI_API_KEY;
   if(!apiKey) throw new Error("GEMINI_API_KEY is not set");
+
+  const resp = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: prompt }]
+          }
+        ],
+        generationConfig: { response_mime_type: "application/json" }
+      })
+    }
+  );
+  
+  if(!resp.ok) {
+    const errorBody = await resp.json();
+    console.log("Error response body : ",errorBody);
+    throw new Error(`Gemini API error : ${resp.status} ${resp.statusText}`);
+  
+  }
+  return resp.json();
 }

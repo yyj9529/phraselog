@@ -16,6 +16,7 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
+  route("/welcome", "features/home/screens/welcome.tsx"),
   route("/robots.txt", "core/screens/robots.ts"),
   route("/sitemap.xml", "core/screens/sitemap.ts"),
   ...prefix("/debug", [
@@ -46,7 +47,7 @@ export default [
 
   layout("core/layouts/navigation.layout.tsx", [
     route("/auth/confirm", "features/auth/screens/confirm.tsx"),
-    index("features/home/screens/home.tsx"),
+    index("features/phraselog/screens/home.tsx"),
     route("/error", "core/screens/error.tsx"),
     layout("core/layouts/public.layout.tsx", [
       // Routes that should only be visible to unauthenticated users.
@@ -93,7 +94,7 @@ export default [
     ]),
 
     ...prefix("/phraselog", [
-      index("features/phraselog/screens/home.tsx"),
+      // index("features/phraselog/screens/home.tsx"),
       route("/learning", "features/phraselog/screens/learning.tsx"),
       route("/create-scene", "features/phraselog/pages/create-scene.tsx"),
       route("/ai-result", "features/phraselog/pages/AiResult.tsx"),

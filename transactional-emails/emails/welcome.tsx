@@ -19,7 +19,7 @@ export default function Welcome({ profile }: { profile: string }) {
           <Preview>Welcome to Supaplate</Preview>
           <Container className="mx-auto max-w-[560px] py-5 pb-12">
             <Heading className="pt-4 text-center text-2xl leading-tight font-normal tracking-[-0.5px] text-black">
-              Welcome to Supaplate
+              Welcome to PhraseLog
             </Heading>
             <Section>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">

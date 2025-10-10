@@ -78,6 +78,7 @@ const loginSchema = z.object({
  * @returns Validation errors, auth errors, or redirect on success
  */
 export async function action({ request }: Route.ActionArgs) {
+  console.log("request...............",request);
   // Parse form data from the request
   const formData = await request.formData();
   const {
