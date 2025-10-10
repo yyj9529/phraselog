@@ -12,7 +12,6 @@
  * - Responsive typography with Tailwind CSS
  */
 
-import type { Route } from "./+types/home";
 
 import { useTranslation } from "react-i18next";
 
@@ -31,12 +30,7 @@ import i18next from "~/core/lib/i18next.server";
  * @param data - Data returned from the loader function containing translated title and subtitle
  * @returns Array of metadata objects for the page
  */
-export const meta: Route.MetaFunction = ({ data }) => {
-  return [
-    { title: data?.title },
-    { name: "description", content: data?.subtitle },
-  ];
-};
+
 
 /**
  * Loader function for server-side data fetching
@@ -53,16 +47,16 @@ export const meta: Route.MetaFunction = ({ data }) => {
  * @param request - The incoming HTTP request containing locale information
  * @returns Object with translated title and subtitle strings
  */
-export async function loader({ request }: Route.LoaderArgs) {
-  // Get a translation function for the user's locale from the request
-  const t = await i18next.getFixedT(request);
+// export async function loader({ request }: Route.LoaderArgs) {
+//   // Get a translation function for the user's locale from the request
+//   const t = await i18next.getFixedT(request);
   
-  // Return translated strings for use in both the component and meta function
-  return {
-    title: t("home.title"),
-    subtitle: t("home.subtitle"),
-  };
-}
+//   // Return translated strings for use in both the component and meta function
+//   return {
+//     title: t("home.title"),
+//     subtitle: t("home.subtitle"),
+//   };
+// }
 
 /**
  * Home page component
