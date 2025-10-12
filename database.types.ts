@@ -183,7 +183,7 @@ export type Database = {
       }
       scenes: {
         Row: {
-          ai_request_prompt: string | null
+          ai_request_prompt_version: string | null
           created_at: string
           desired_nuance: string | null
           id: string
@@ -194,7 +194,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          ai_request_prompt?: string | null
+          ai_request_prompt_version?: string | null
           created_at?: string
           desired_nuance?: string | null
           id?: string
@@ -205,7 +205,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          ai_request_prompt?: string | null
+          ai_request_prompt_version?: string | null
           created_at?: string
           desired_nuance?: string | null
           id?: string

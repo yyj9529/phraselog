@@ -1,4 +1,5 @@
 // 프롬프트 생성 함수 (매개변수로 플레이스홀더 값 받음)
+export const prompt_version = "4.0";
 export function generatePrompt4_0(to_who: string, intention: string, context: string, nuances: string[] = []) {
   return `
 # IDENTITY
