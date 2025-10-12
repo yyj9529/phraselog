@@ -1,0 +1,1 @@
+ALTER TABLE "scenes" RENAME COLUMN "ai_request_prompt" TO "ai_request_prompt_version";

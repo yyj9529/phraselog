@@ -16,7 +16,7 @@ export const scenes = pgTable('scenes', {
     // 사용자가 선택한 뉘앙스 (쉼표로 구분된 문자열 또는 배열 타입)
     desired_nuance: text('desired_nuance'), // 예: "친절하게,정중하게"
     // AI에 요청한 원본 프롬프트 (디버깅 및 재사용 목적)
-    ai_request_prompt: text('ai_request_prompt'),
+    ai_request_prompt_version: text('ai_request_prompt_version'),
     created_at: timestamp('created_at').defaultNow().notNull(),
     updated_at: timestamp('updated_at').defaultNow().notNull(),
 });

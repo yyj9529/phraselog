@@ -1,6 +1,7 @@
 import { Button } from "~/core/components/ui/button";
 import { useState, useMemo } from "react";
 import type { SceneData } from "../hooks/use-phrases";
+import { ExpressionCard } from "../components/expressionCard";
 
 
 export interface AIExpression {
@@ -8,22 +9,43 @@ export interface AIExpression {
   coaching: string;
 }
 
+
+
 interface AIResponseScreenProps {
-  expressions: AIExpression[];
+  airesults: AIExpression[];
+  sceneId: string;
   scene: SceneData | null;
-  onSave: (expression: AIExpression) => void;
+  onSave: (expressions: AIExpression[], sceneId: string) => void;
   onRegenerate: () => void;
   isLoading?: boolean;
 }
 
 export function AIResponseScreen({ 
-  expressions, 
+  airesults,  
+  sceneId,
   scene,
   onSave, 
   onRegenerate,
   isLoading = false 
 }: AIResponseScreenProps) {
-  console.log('AIResponseScreen 렌더링 - expressions:', expressions);
+
+  const [selectedExpressions, setSelectedExpressions] = useState<AIExpression[]>([]);
+
+  const handleToggleExpression = (expression: AIExpression) => {
+    setSelectedExpressions(prev => 
+      prev.some(item => item.expression === expression.expression)
+        ? prev.filter(item => item.expression !== expression.expression)
+        : [...prev, expression]
+    );
+  };
+
+  const handleSaveSelected = () => {
+    if (selectedExpressions.length > 0) {
+      onSave(selectedExpressions, sceneId);
+    }
+  };
+
+  console.log('AIResponseScreen 렌더링 - expressions:', airesults);
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -57,7 +79,7 @@ export function AIResponseScreen({
             <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4" />
             <p className="text-slate-500">AI가 표현을 생성하고 있습니다...</p>
           </div>
-        ) : expressions.length === 0 ? (
+        ) : airesults.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <p className="text-slate-500 mb-4">생성된 표현이 없습니다.</p>
             <Button
@@ -69,116 +91,36 @@ export function AIResponseScreen({
           </div>
         ) : (
           <>
-            {expressions.map((expr, index) => (
+            {airesults.map((result,index) => (
               <ExpressionCard
                 key={index}
-                expression={expr.expression}
-                coaching={expr.coaching}
-                onSave={() => onSave(expr)}
+                expression={result.expression}
+                coaching={result.coaching}
+                isSelected={selectedExpressions.some(item => item.expression === result.expression)}
+                onToggle={() => handleToggleExpression(result)}
               />
             ))}
 
-            {/* Regenerate Button */}
-            <div className="pt-4">
+            {/* Save & Regenerate Buttons */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 flex items-center justify-center gap-4">
+              <Button
+                onClick={handleSaveSelected}
+                disabled={selectedExpressions.length === 0 || isLoading}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-4 text-base font-semibold disabled:bg-slate-300"
+              >
+                {selectedExpressions.length > 0 ? `${selectedExpressions.length}개 표현 저장하기` : '표현을 선택해주세요'}
+              </Button>
               <Button
                 onClick={onRegenerate}
                 variant="outline"
-                className="w-full border-slate-300 text-slate-700 rounded-lg py-4 hover:bg-slate-50"
+                className="flex-1 border-slate-300 text-slate-700 rounded-lg py-4 text-base hover:bg-slate-50"
               >
-                처음으로 돌아가기
+                다시 만들기
               </Button>
             </div>
           </>
         )}
       </main>
-    </div>
-  );
-}
-
-interface ExpressionCardProps {
-  expression: string;
-  coaching: string;
-  onSave: () => void;
-}
-
-function ExpressionCard({ expression, coaching, onSave }: ExpressionCardProps) {
-  const coachingCategories = useMemo(() => ["설명", "문화적 맥락", "전략적 조언"], []);
-  const [selectedCategory, setSelectedCategory] = useState(coachingCategories[0]);
-
-  const parsedCoaching = useMemo(() => {
-    const parts: { [key: string]: string } = {};
-    
-    // Normalize different bracket types
-    const normalizedCoaching = coaching
-      .replace(/【문화적 맥락】/g, '[문화적 맥락]')
-      .replace(/【전략적 조언】/g, '[전략적 조언]');
-
-    let lastCategory: string | null = null;
-    let lastIndex = 0;
-
-    const regex = /\[(.*?)\]/g;
-    let match;
-
-    while ((match = regex.exec(normalizedCoaching)) !== null) {
-      if (lastCategory) {
-        parts[lastCategory] = normalizedCoaching.substring(lastIndex, match.index).trim();
-      }
-      lastCategory = match[1];
-      lastIndex = regex.lastIndex;
-    }
-
-    if (lastCategory) {
-      parts[lastCategory] = normalizedCoaching.substring(lastIndex).trim();
-    }
-    
-    // If no tags are found, assume the whole text is "설명"
-    if (Object.keys(parts).length === 0 && coaching) {
-      parts[coachingCategories[0]] = coaching;
-    }
-
-    return parts;
-  }, [coaching, coachingCategories]);
-
-  return (
-    <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
-      {/* Expression Text */}
-      <h3 className="text-lg font-semibold text-slate-800">
-        "{expression}"
-      </h3>
-
-      {/* Segmented Control */}
-      <div className="flex w-full bg-slate-200/60 rounded-lg p-1">
-        {coachingCategories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-colors duration-200 ease-in-out
-              ${
-                selectedCategory === category
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "bg-transparent text-slate-500 hover:text-slate-700"
-              }
-            `}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
-      {/* Coaching Text */}
-      <p className="text-sm text-slate-600 leading-relaxed min-h-[6em]">
-        {parsedCoaching[selectedCategory] || "내용을 불러올 수 없습니다."}
-      </p>
-
-      {/* Save Button */}
-      <div className="pt-2">
-        <Button
-          onClick={onSave}
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-6 py-2 text-sm font-semibold"
-        >
-          Save
-        </Button>
-      </div>
     </div>
   );
 }
