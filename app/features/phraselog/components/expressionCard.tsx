@@ -1,95 +1,80 @@
-import { useState, useMemo } from "react";
-import { Button } from "~/core/components/ui/button";
+// 이 파일의 전체적인 구조는 추정하여 작성되었습니다.
+// 실제 코드에 맞게 key 부분이나 구조를 조절해주세요.
 
+import { useState, useMemo } from "react";
+
+// [추가] Coaching 데이터와 관련된 타입 및 상수 정의
+// (이 부분은 learning.tsx와 중복되므로, 추후 별도의 types.ts 파일로 분리하면 더 좋습니다.)
+const coachingCategories = ["설명", "문화적 맥락", "전략적 조언"] as const;
+type Category = typeof coachingCategories[number];
+
+type CoachingObject = {
+  explanation: string;
+  cultural_context: string;
+  strategic_advice: string;
+};
+
+const categoryMap: Record<Category, keyof CoachingObject> = {
+  "설명": "explanation",
+  "문화적 맥락": "cultural_context",
+  "전략적 조언": "strategic_advice",
+};
+
+// [수정] coaching prop의 타입을 명확하게 정의합니다.
 interface ExpressionCardProps {
   expression: string;
-  coaching: string;
+  coaching: CoachingObject; // 이 컴포넌트는 객체를 직접 받습니다.
   isSelected: boolean;
   onToggle: () => void;
 }
 
 export function ExpressionCard({ expression, coaching, isSelected, onToggle }: ExpressionCardProps) {
-  const coachingCategories = useMemo(() => ["설명", "문화적 맥락", "전략적 조언"], []);
-  const [selectedCategory, setSelectedCategory] = useState(coachingCategories[0]);
+  const [openAnalysis, setOpenAnalysis] = useState(false);
+  // [수정] useState의 타입을 Category로 명시적으로 지정합니다.
+  const [selectedCategory, setSelectedCategory] = useState<Category>(coachingCategories[0]);
 
-  const parsedCoaching = useMemo(() => {
-    const parts: { [key: string]: string } = {};
-    
-    // Normalize different bracket types
-    const normalizedCoaching = coaching.replace(/【설명】/g, '[설명]')
-      .replace(/【문화적 맥락】/g, '[문화적 맥락]')
-      .replace(/【전략적 조언】/g, '[전략적 조언]');
-
-    let lastCategory: string | null = null;
-    let lastIndex = 0;
-
-    const regex = /\[(.*?)\]/g;
-    let match;
-
-    while ((match = regex.exec(normalizedCoaching)) !== null) {
-      if (lastCategory) {
-        parts[lastCategory] = normalizedCoaching.substring(lastIndex, match.index).trim();
-      }
-      lastCategory = match[1];
-      lastIndex = regex.lastIndex;
-    }
-
-    if (lastCategory) {
-      parts[lastCategory] = normalizedCoaching.substring(lastIndex).trim();
-    }
-    
-    // If no tags are found, assume the whole text is "설명"
-    if (Object.keys(parts).length === 0 && coaching) {
-      parts[coachingCategories[0]] = coaching;
-    }
-
-    return parts;
-  }, [coaching, coachingCategories]);
+  // 이 컴포넌트에서는 coaching prop이 이미 객체이므로 JSON.parse가 필요 없습니다.
 
   return (
-    <div
-      onClick={onToggle}
-      className={`relative bg-slate-50 border rounded-xl p-5 space-y-4 cursor-pointer transition-all duration-200
-        ${isSelected ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-200 hover:border-slate-300"}
-      `}
-    >
-      {/* Checkbox visual indicator */}
-      {isSelected && (
-        <div className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-      )}
-
-      {/* Expression Text */}
-      <h3 className="text-lg font-semibold text-slate-800 pr-8">
-        "{expression}"
-      </h3>
-
-      {/* Segmented Control */}
-      <div className="flex w-full bg-slate-200/60 rounded-lg p-1">
-        {coachingCategories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-colors duration-200 ease-in-out
-              ${
-                selectedCategory === category
-                  ? "bg-white text-slate-800 shadow-sm"
-                  : "bg-transparent text-slate-500 hover:text-slate-700"
-              }
-            `}
-          >
-            {category}
-          </button>
-        ))}
+    <div className={`border rounded-xl p-4 transition-shadow hover:shadow-md ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'}`}>
+      <div onClick={onToggle} className="cursor-pointer">
+        <p className="font-semibold text-blue-600 text-base mb-2">{expression}</p>
       </div>
+      
+      <div className="mt-2">
+        <button 
+          onClick={() => setOpenAnalysis(!openAnalysis)}
+          className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg flex justify-between items-center transition-colors"
+        >
+          <span>AI 분석 결과 보기</span>
+          <span className={`transform transition-transform duration-200 ${openAnalysis ? 'rotate-180' : ''}`}>▼</span>
+        </button>
 
-      {/* Coaching Text */}
-      <p className="text-sm text-slate-600 leading-relaxed min-h-[6em]">
-        {parsedCoaching[selectedCategory] || "내용을 불러올 수 없습니다."}
-      </p>
+        {openAnalysis && (
+          <div className="mt-2 p-4 bg-white rounded-lg border border-slate-200 animate-in fade-in-50 space-y-3">
+            <div className="flex w-full bg-slate-200/60 rounded-lg p-1">
+              {coachingCategories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-colors duration-200 ease-in-out ${
+                    selectedCategory === category
+                      ? "bg-white text-slate-800 shadow-sm"
+                      : "bg-transparent text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+            
+            <p className="text-sm text-slate-600 leading-relaxed min-h-[5em]">
+              {/* [수정] 타입이 지정된 맵을 사용하여 안전하게 데이터에 접근합니다. */}
+              {coaching[categoryMap[selectedCategory]] || "내용이 없습니다."}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

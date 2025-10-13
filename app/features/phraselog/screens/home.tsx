@@ -77,7 +77,8 @@ export default function PhraseLogHome() {
       const formData = new FormData();
       formData.append("sceneId", sceneId);
       formData.append("expression", expression.expression);
-      formData.append("coaching", expression.coaching);
+      // [수정] coaching 객체를 JSON 문자열로 변환하여 전송합니다.
+      formData.append("coaching", JSON.stringify(expression.coaching));
       // [수정] 'example' 객체를 JSON 문자열로 변환하여 추가합니다.
       if (expression.example) {
         formData.append("example", JSON.stringify(expression.example));
