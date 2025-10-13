@@ -2,7 +2,7 @@ import type { Route } from ".react-router/types/app/features/phraselog/screens/+
 import { z } from "zod";
 import { data } from "react-router";
 import { callGemini } from "../hooks/use-phrases";
-import { generatePrompt4_0 } from "./prompt";
+import { generatePrompt4_1 } from "./prompt";
 import makeServerClient from "~/core/lib/supa-client.server";
 import { insertScene } from "../queries";
 import { prompt_version } from "./prompt";
@@ -52,12 +52,23 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const v = parsed.data;
-  const prompt = generatePrompt4_0(v.to_who, v.intention, v.context, v.nuances);
+  const prompt = generatePrompt4_1(v.to_who, v.intention, v.context, v.nuances);
 
-  try {
+  try{
+    console.log('🚀 AI 호출 시작...');
     const geminiResponse = await callGemini(prompt);
+    console.log('✅ Gemini 응답 받음:', geminiResponse);
+    
     const aiResponse = geminiResponse.candidates[0].content.parts[0].text;
+    
+    // --- 여기부터 추가 ---
+    console.log('---------- [AI 원본 응답] ----------');
+    console.log(aiResponse);
+    console.log('------------------------------------');
+    // --- 여기까지 추가 ---
+
     const aiResponseJson = JSON.parse(aiResponse);
+    console.log('🎉 JSON 파싱 완료:', aiResponseJson);
 
     // queries.ts에 정의한 insertScene 함수를 호출합니다.
     const newScene = await insertScene(client, {

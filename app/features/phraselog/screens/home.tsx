@@ -64,6 +64,12 @@ export default function PhraseLogHome() {
 
   const handleSaveExpression = async (expressions: AIExpression[], sceneId: string) => {
     
+    // --- 여기 추가 ---
+    console.log('--- [저장 직전 데이터 확인] ---');
+    console.log(JSON.stringify(expressions, null, 2));
+    console.log('---------------------------');
+    // --- 여기까지 추가 ---
+
     console.log("Saving expressions:", expressions);
     
     // 여러 표현을 저장하기 위해 Promise.all을 사용합니다.
@@ -72,6 +78,10 @@ export default function PhraseLogHome() {
       formData.append("sceneId", sceneId);
       formData.append("expression", expression.expression);
       formData.append("coaching", expression.coaching);
+      // [수정] 'example' 객체를 JSON 문자열로 변환하여 추가합니다.
+      if (expression.example) {
+        formData.append("example", JSON.stringify(expression.example));
+      }
       return fetch("/phraselog/save-phrase", {
         method: "POST",
         body: formData,
@@ -88,7 +98,7 @@ export default function PhraseLogHome() {
       
       if (allSucceeded) {
         alert(`${expressions.length}개의 표현이 저장되었습니다.`);
-        navigate("/my-phrases");
+        navigate("/phraselog/learning");
       } else {
         // 실패한 요청이 하나라도 있는 경우
         const failedCount = responses.filter(res => !res.ok).length;
