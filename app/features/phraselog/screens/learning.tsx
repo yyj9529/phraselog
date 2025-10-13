@@ -6,11 +6,27 @@ import { Button } from "~/core/components/ui/button";
 import { useState, useMemo } from "react"; // useMemo 추가
 import { Modal } from "~/core/components/ui/modal";
 
+// [추가] Coaching 데이터와 관련된 타입 및 상수 정의 (컴포넌트 외부)
+const coachingCategories = ["설명", "문화적 맥락", "전략적 조언"] as const;
+type Category = typeof coachingCategories[number];
+
+type CoachingObject = {
+  explanation: string;
+  cultural_context: string;
+  strategic_advice: string;
+};
+
+const categoryMap: Record<Category, keyof CoachingObject> = {
+  "설명": "explanation",
+  "문화적 맥락": "cultural_context",
+  "전략적 조언": "strategic_advice",
+};
+
 // 데이터 타입을 정의합니다.
 type Phrase = {
   id: string;
   english_phrase: string;
-  explanation: string;
+  explanation: string; // 이 필드는 DB에서 온 JSON 문자열입니다.
   example: { en: string; ko: string } | null;
 };
 
@@ -24,43 +40,23 @@ type SceneWithPhrases = {
 };
 
 // --- AI 분석 결과를 보여주는 별도의 컴포넌트 ---
-// ai-response.tsx에 있던 로직을 가져와 재사용합니다.
+// [수정] coaching prop은 DB에서 온 문자열이므로 string 타입을 받습니다.
 function AnalysisResult({ coaching }: { coaching: string }) {
-  const coachingCategories = useMemo(() => ["설명", "문화적 맥락", "전략적 조언"], []);
-  const [selectedCategory, setSelectedCategory] = useState(coachingCategories[0]);
+  // [수정] useState의 타입을 Category로 명시적으로 지정합니다.
+  const [selectedCategory, setSelectedCategory] = useState<Category>(coachingCategories[0]);
 
-  const parsedCoaching = useMemo(() => {
-    const parts: { [key: string]: string } = {};
-    const normalizedCoaching = coaching
-      .replace(/【문화적 맥락】/g, '[문화적 맥락]')
-      .replace(/【전략적 조언】/g, '[전략적 조언]');
-
-    let lastCategory: string | null = null;
-    let lastIndex = 0;
-    const regex = /\[(.*?)\]/g;
-    let match;
-
-    // "설명" 태그가 없는 경우를 대비해 텍스트 시작을 "설명"으로 간주
-    const textToParse = normalizedCoaching.trim().startsWith('[') ? normalizedCoaching : `[설명]${normalizedCoaching}`;
-
-    while ((match = regex.exec(textToParse)) !== null) {
-      if (lastCategory) {
-        parts[lastCategory] = textToParse.substring(lastIndex, match.index).trim();
+  // [수정] DB에서 받은 JSON 문자열을 파싱합니다.
+  const parsedCoaching: CoachingObject = useMemo(() => {
+    try {
+      if (coaching && typeof coaching === 'string') {
+        return JSON.parse(coaching);
       }
-      lastCategory = match[1];
-      lastIndex = regex.lastIndex;
+    } catch (e) {
+      console.error("Coaching JSON 파싱 실패:", e);
     }
-
-    if (lastCategory) {
-      parts[lastCategory] = textToParse.substring(lastIndex).trim();
-    }
-    
-    if (Object.keys(parts).length === 0 && coaching) {
-      parts[coachingCategories[0]] = coaching;
-    }
-
-    return parts;
-  }, [coaching, coachingCategories]);
+    // 파싱 실패 시 UI 깨짐을 방지하기 위해 기본값을 반환합니다.
+    return { explanation: "분석 결과를 불러올 수 없습니다.", cultural_context: "", strategic_advice: "" };
+  }, [coaching]);
 
   return (
     <div className="mt-2 p-4 bg-white rounded-lg border border-slate-200 animate-in fade-in-50 space-y-3">
@@ -83,7 +79,8 @@ function AnalysisResult({ coaching }: { coaching: string }) {
 
       {/* Coaching Text */}
       <p className="text-sm text-slate-600 leading-relaxed min-h-[5em]">
-        {parsedCoaching[selectedCategory] || "내용이 없습니다."}
+        {/* [수정] 파싱된 객체와 타입이 지정된 맵을 사용하여 안전하게 데이터에 접근합니다. */}
+        {parsedCoaching[categoryMap[selectedCategory]] || "내용이 없습니다."}
       </p>
     </div>
   );
