@@ -52,3 +52,36 @@ export const insertPhrase = async (
   
     return data;
   };
+
+/**
+ * 특정 사용자의 모든 Scene과 각 Scene에 속한 Phrase들을 함께 조회합니다.
+ * @param client Supabase 클라이언트
+ * @param userId 사용자 ID
+ * @returns Scene과 Phrase가 포함된 배열
+ */
+export async function getScenesWithPhrases(client: SupabaseClient, userId: string) {
+    const { data, error } = await client
+      .from('scenes')
+      .select(`
+        id,
+        my_intention,
+        to_who,
+        the_context,
+        desired_nuance,
+        phrases (
+          id,
+          english_phrase,
+          explanation,
+          example
+        )
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+  
+    if (error) {
+      console.error("Error fetching scenes with phrases:", error);
+      return [];
+    }
+  
+    return data;
+}

@@ -7,6 +7,10 @@ import { ExpressionCard } from "../components/expressionCard";
 export interface AIExpression {
   expression: string;
   coaching: string;
+  example: {
+    en: string;
+    ko: string;
+  };
 }
 
 

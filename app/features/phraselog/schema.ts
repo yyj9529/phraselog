@@ -3,6 +3,7 @@ import { timestamp } from "drizzle-orm/pg-core";
 import { authUsers } from "drizzle-orm/supabase";
 import { profiles } from "../users/schema";
 import { boolean } from "drizzle-orm/pg-core";
+import { jsonb } from "drizzle-orm/pg-core";
 
 export const scenes = pgTable('scenes', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -28,6 +29,8 @@ export const phrases = pgTable('phrases', {
     english_phrase: text('english_phrase').notNull(),
     // AI가 제안한 표현에 대한 설명 (한국어)
     explanation: text('explanation').notNull(),
+    // 새로운 프롬프트로부터 받은 구조화된 예문 (JSON 형태)
+    example: jsonb('example').$type<{ en: string; ko: string }>(),
     // 사용자가 이 표현을 자신의 노트에 저장했는지 여부 (PhraseLog의 핵심)
     is_saved_by_user: boolean('is_saved_by_user').default(false).notNull(),
     // AI 응답의 원본 데이터 (필요시)

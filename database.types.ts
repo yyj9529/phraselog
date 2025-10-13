@@ -118,6 +118,7 @@ export type Database = {
           ai_response_raw: string | null
           created_at: string
           english_phrase: string
+          example: Json | null
           explanation: string
           id: string
           is_saved_by_user: boolean
@@ -128,6 +129,7 @@ export type Database = {
           ai_response_raw?: string | null
           created_at?: string
           english_phrase: string
+          example?: Json | null
           explanation: string
           id?: string
           is_saved_by_user?: boolean
@@ -138,6 +140,7 @@ export type Database = {
           ai_response_raw?: string | null
           created_at?: string
           english_phrase?: string
+          example?: Json | null
           explanation?: string
           id?: string
           is_saved_by_user?: boolean
