@@ -183,7 +183,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
     }
   }, [actionData]);
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex flex-grow flex-col items-center justify-center gap-4">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold" role="heading">
@@ -284,12 +284,12 @@ export default function Join({ actionData }: Route.ComponentProps) {
               <FormErrors errors={[actionData.error]} />
             ) : null}
 
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Checkbox id="marketing" name="marketing" />
               <Label htmlFor="marketing" className="text-muted-foreground">
                 Sign up for marketing emails
               </Label>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2">
               <Checkbox id="terms" name="terms" checked />
               <Label htmlFor="terms" className="text-muted-foreground">

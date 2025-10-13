@@ -167,14 +167,15 @@ function Actions() {
   return (
     <>
       {/* Settings/debug dropdown menu */}
-      <DropdownMenu>
+     
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild className="cursor-pointer">
           <Button variant="ghost" size="icon">
             <CogIcon className="size-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {/* Sentry monitoring link */}
+          
           <DropdownMenuItem asChild>
             <SheetClose asChild>
               <Link to="/debug/sentry" viewTransition>
@@ -182,7 +183,7 @@ function Actions() {
               </Link>
             </SheetClose>
           </DropdownMenuItem>
-          {/* Google Analytics link */}
+        
           <DropdownMenuItem asChild>
             <SheetClose asChild>
               <Link to="/debug/analytics" viewTransition>
@@ -191,8 +192,9 @@ function Actions() {
             </SheetClose>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
       
+
       {/* Theme switcher component (light/dark mode) */}
       <ThemeSwitcher />
       
@@ -254,27 +256,36 @@ export function NavigationBar({
         <div className="hidden h-full items-center gap-5 md:flex">
           {/* Main navigation links */}
         
-          <Link
+          {/* <Link
             to="/blog"
             viewTransition
             className="text-muted-foreground hover:text-foreground text-sm transition-colors"
           >
             Blog
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             to="/contact"
             viewTransition
             className="text-muted-foreground hover:text-foreground text-sm transition-colors"
           >
             Contact
-          </Link>
-          <Link
+          </Link> */}
+          {name && (
+            <Link
+              to="/phraselog/learning"
+              viewTransition
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            >
+              지난 표현 복습하기
+            </Link>
+          )}
+          {/* <Link
             to="/payments/checkout"
             viewTransition
             className="text-muted-foreground hover:text-foreground text-sm transition-colors"
           >
             Payments
-          </Link>
+          </Link> */}
           
           <Separator orientation="vertical" />
           
@@ -311,15 +322,20 @@ export function NavigationBar({
             <SheetClose asChild>
               <Link to="/phraselog">PhraseLog</Link>
             </SheetClose>
-            <SheetClose asChild>
+            {/* <SheetClose asChild>
               <Link to="/blog">Blog</Link>
-            </SheetClose>
+            </SheetClose> */}
+            {name && (
+              <SheetClose asChild>
+                <Link to="/phraselog/learning">My Learning</Link>
+              </SheetClose>
+            )}
             <SheetClose asChild>
               <Link to="/contact">Contact</Link>
             </SheetClose>
-            <SheetClose asChild>
+            {/* <SheetClose asChild>
               <Link to="/payments/checkout">Payments</Link>
-            </SheetClose>
+            </SheetClose> */}
           </SheetHeader>
           {loading ? (
             <div className="flex items-center">

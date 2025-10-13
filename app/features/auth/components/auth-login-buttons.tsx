@@ -126,7 +126,7 @@ function SocialLoginButtons() {
         label="Google"
         href="/auth/social/start/google"
       />
-      <AuthLoginButton
+      {/* <AuthLoginButton
         logo={<GithubLogo className="size-4 scale-125 dark:text-white" />}
         label="Github"
         href="/auth/social/start/github"
@@ -135,7 +135,7 @@ function SocialLoginButtons() {
         logo={<AppleLogo className="size-4 scale-150 dark:text-white" />}
         label="Apple"
         href="/auth/social/start/apple"
-      />
+      /> */}
       <AuthLoginButton
         logo={<KakaoLogo className="size-4 scale-125 dark:text-yellow-300" />}
         label="Kakao"
@@ -161,7 +161,7 @@ export function SignInButtons() {
     <>
       <Divider />
       <SocialLoginButtons />
-      <_SignInButtons />
+      {/* <_SignInButtons /> */}
     </>
   );
 }
