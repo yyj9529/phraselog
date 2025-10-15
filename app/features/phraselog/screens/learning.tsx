@@ -1,10 +1,28 @@
 import type { Route } from ".react-router/types/app/features/phraselog/screens/+types/learning.ts";
-import { useLoaderData, Link, data } from "react-router";
+import { useLoaderData, Link, data, useFetcher } from "react-router";
 import makeServerClient from "~/core/lib/supa-client.server";
-import { getScenesWithPhrases } from "../queries";
 import { Button } from "~/core/components/ui/button";
 import { useState, useMemo } from "react"; // useMemo 추가
 import { Modal } from "~/core/components/ui/modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/core/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "~/core/components/ui/pagination";
+import { deleteScene } from "../queries";
 
 // [추가] Coaching 데이터와 관련된 타입 및 상수 정의 (컴포넌트 외부)
 const coachingCategories = ["설명", "문화적 맥락", "전략적 조언"] as const;
@@ -86,7 +104,6 @@ function AnalysisResult({ coaching }: { coaching: string }) {
   );
 }
 
-
 // 서버 사이드에서 데이터를 로드하는 loader 함수입니다.
 export async function loader({ request }: Route.LoaderArgs) {
   const [client, headers] = makeServerClient(request);
@@ -94,18 +111,99 @@ export async function loader({ request }: Route.LoaderArgs) {
     data: { user },
   } = await client.auth.getUser();
 
-  if(user) {
-    const scenesData = await getScenesWithPhrases(client, user.id);
-    const scenes = scenesData || [];
-    return data({ scenes }, { headers });
+  if (user) {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const itemsPerPage = 5;
+    const from = (page - 1) * itemsPerPage;
+    const to = from + itemsPerPage - 1;
+
+    // 전체 카운트 가져오기
+    const { count, error: countError } = await client
+      .from('scenes')
+      .select('id, phrases!inner(id)', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+
+    console.log("count ......................... ", count);
+    console.log("user.id ......................... ", user.id);
+    if (countError) {
+      console.error('Error fetching scenes count:', countError);
+      // 에러 처리 로직을 추가할 수 있습니다.
+    }
+
+    // 페이지네이션된 데이터 가져오기
+    const { data: scenesData, error } = await client
+      .from('scenes')
+      .select(`
+        id,
+        my_intention,
+        to_who,
+        the_context,
+        desired_nuance,
+        phrases!inner(
+          id,
+          english_phrase,
+          explanation,
+          example
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .range(from, to);
+
+    if (error) {
+      console.error("Error fetching scenes with phrases:", error);
+      return data({ scenes: [], totalPages: 0, currentPage: 1 }, { headers });
+    }
+    
+    // scenesData의 타입을 명시적으로 지정하여 타입 에러를 해결합니다.
+    const scenes: SceneWithPhrases[] = (scenesData as any) || [];
+    const totalPages = Math.ceil((count || 0) / itemsPerPage);
+
+    return data({ scenes, totalPages, currentPage: page }, { headers });
   }
-  return data({ scenes: [] }, { headers });
+
+  return data({ scenes: [], totalPages: 0, currentPage: 1 }, { headers });
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const [client, headers] = makeServerClient(request);
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+
+  if (!user) {
+    // or handle as an error
+    return data({ success: false, error: "Unauthorized" }, { status: 401, headers });
+  }
+
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent === "deleteScene") {
+    const sceneId = formData.get("sceneId") as string;
+    if (!sceneId) {
+      return data({ success: false, error: "Scene ID is missing" }, { status: 400, headers });
+    }
+    try {
+      await deleteScene(client, sceneId, user.id);
+      return data({ success: true }, { headers });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Deletion failed:", errorMessage);
+      return data({ success: false, error: errorMessage }, { status: 500, headers });
+    }
+  }
+
+  return data({ success: false, error: "Invalid intent" }, { status: 400, headers });
 }
 
 export default function LearningScreen(loaderData: Route.ComponentProps) {
-  const scenes = loaderData.loaderData?.scenes || [];
+  const { scenes = [], totalPages = 0, currentPage = 1 } = loaderData.loaderData || {};
   const [openAnalysisId, setOpenAnalysisId] = useState<string | null>(null);
   const [selectedScene, setSelectedScene] = useState<SceneWithPhrases | null>(null);
+  const [sceneToDelete, setSceneToDelete] = useState<SceneWithPhrases | null>(null);
+  const fetcher = useFetcher();
 
   const toggleAnalysis = (phraseId: string) => {
     setOpenAnalysisId(openAnalysisId === phraseId ? null : phraseId);
@@ -113,6 +211,11 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
 
   const handleSceneClick = (scene: SceneWithPhrases) => {
     setSelectedScene(scene);
+  };
+
+  const openDeleteModal = (scene: SceneWithPhrases, e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
+    setSceneToDelete(scene);
   };
 
   const closeModal = () => {
@@ -150,15 +253,24 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
             <div key={scene.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div 
                 className="p-5 bg-slate-100/80 border-b border-slate-200 cursor-pointer hover:bg-slate-200/60"
-                onClick={() => handleSceneClick(scene)}
               >
                 <div className="flex justify-between items-center">
                   <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                     MY SCENE
                   </h2>
-                  <span className="text-xs text-slate-400">자세히 보기 &rarr;</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-slate-400 cursor-pointer hover:underline" onClick={() => handleSceneClick(scene)}>자세히 보기 &rarr;</span>
+                    <button 
+                      onClick={(e) => openDeleteModal(scene, e)}
+                      className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-full"
+                      aria-label="Delete scene"
+                    >
+                      {/* 간단한 SVG 휴지통 아이콘 */}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                  </div>
                 </div>
-                <p className="text-slate-700 text-base">
+                <p className="text-slate-700 text-base" onClick={() => handleSceneClick(scene)}>
                   <span className="font-semibold">To:</span> {scene.to_who}, <span className="font-semibold">Intention:</span> {scene.my_intention}, <span className="font-semibold">Context:</span> {scene.the_context}
                   {scene.desired_nuance && (
                     <span className="italic text-slate-600"> ({scene.desired_nuance})</span>
@@ -192,6 +304,39 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
             </div>
           ))}
         </div>
+        
+        {totalPages > 1 && (
+          <div className="mt-12">
+            <Pagination>
+              <PaginationContent>
+                {currentPage > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious href={`?page=${currentPage - 1}`} />
+                  </PaginationItem>
+                )}
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href={`?page=${page}`}
+                        isActive={page === currentPage}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+
+                {currentPage < totalPages && (
+                  <PaginationItem>
+                    <PaginationNext href={`?page=${currentPage + 1}`} />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </main>
 
       <Modal isOpen={!!selectedScene} onClose={closeModal} title="Scene Details">
@@ -234,6 +379,27 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
           </div>
         )}
       </Modal>
+
+      <AlertDialog open={!!sceneToDelete} onOpenChange={(open) => !open && setSceneToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>정말로 삭제하시겠습니까?</AlertDialogTitle>
+            <AlertDialogDescription>
+              이 작업은 되돌릴 수 없습니다. 장면과 관련된 모든 표현들이 영구적으로 삭제됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>취소</AlertDialogCancel>
+            <fetcher.Form method="post" onSubmit={() => setSceneToDelete(null)} className="inline-flex">
+              <input type="hidden" name="intent" value="deleteScene" />
+              <input type="hidden" name="sceneId" value={sceneToDelete?.id} />
+              <Button type="submit" variant="destructive" asChild>
+                 <AlertDialogAction>삭제</AlertDialogAction>
+              </Button>
+            </fetcher.Form>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

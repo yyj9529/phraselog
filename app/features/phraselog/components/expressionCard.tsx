@@ -1,7 +1,10 @@
 // 이 파일의 전체적인 구조는 추정하여 작성되었습니다.
 // 실제 코드에 맞게 key 부분이나 구조를 조절해주세요.
 
+import { jsxDEV } from "react/jsx-dev-runtime";
 import { useState, useMemo } from "react";
+import { Button } from "~/core/components/ui/button";
+import { Card } from "~/core/components/ui/card";
 
 // [추가] Coaching 데이터와 관련된 타입 및 상수 정의
 // (이 부분은 learning.tsx와 중복되므로, 추후 별도의 types.ts 파일로 분리하면 더 좋습니다.)
@@ -35,32 +38,44 @@ export function ExpressionCard({ expression, coaching, isSelected, onToggle }: E
 
   // 이 컴포넌트에서는 coaching prop이 이미 객체이므로 JSON.parse가 필요 없습니다.
 
+  const handleCardClick = () => {
+    onToggle(); // isSelected 상태를 직접 토글
+  };
+
   return (
-    <div className={`border rounded-xl p-4 transition-shadow hover:shadow-md ${isSelected ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'}`}>
-      <div onClick={onToggle} className="cursor-pointer">
-        <p className="font-semibold text-blue-600 text-base mb-2">{expression}</p>
+    <Card 
+      className={`p-4 rounded-xl border-2 transition-colors duration-200 cursor-pointer ${
+        isSelected 
+          ? 'border-primary bg-primary/5' 
+          : 'border-border bg-card hover:bg-muted/50'
+      }`}
+      onClick={handleCardClick}
+    >
+      <div>
+        <p className="font-semibold text-primary text-base mb-2">{expression}</p>
+        {/* کوچ칭 및 예시 UI */}
       </div>
       
-      <div className="mt-2">
+      <div className="mt-4">
         <button 
           onClick={() => setOpenAnalysis(!openAnalysis)}
-          className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg flex justify-between items-center transition-colors"
+          className="w-full bg-muted hover:bg-muted/80 text-foreground font-semibold py-2 px-4 rounded-lg flex justify-between items-center transition-colors"
         >
           <span>AI 분석 결과 보기</span>
           <span className={`transform transition-transform duration-200 ${openAnalysis ? 'rotate-180' : ''}`}>▼</span>
         </button>
 
         {openAnalysis && (
-          <div className="mt-2 p-4 bg-white rounded-lg border border-slate-200 animate-in fade-in-50 space-y-3">
-            <div className="flex w-full bg-slate-200/60 rounded-lg p-1">
+          <div className="mt-2 p-4 bg-background rounded-lg border animate-in fade-in-50 space-y-3">
+            <div className="flex w-full bg-muted rounded-lg p-1">
               {coachingCategories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
                   className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-colors duration-200 ease-in-out ${
                     selectedCategory === category
-                      ? "bg-white text-slate-800 shadow-sm"
-                      : "bg-transparent text-slate-500 hover:text-slate-700"
+                      ? "bg-card text-foreground shadow-sm"
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {category}
@@ -68,13 +83,13 @@ export function ExpressionCard({ expression, coaching, isSelected, onToggle }: E
               ))}
             </div>
             
-            <p className="text-sm text-slate-600 leading-relaxed min-h-[5em]">
+            <p className="text-sm text-muted-foreground leading-relaxed min-h-[5em]">
               {/* [수정] 타입이 지정된 맵을 사용하여 안전하게 데이터에 접근합니다. */}
               {coaching[categoryMap[selectedCategory]] || "내용이 없습니다."}
             </p>
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }
