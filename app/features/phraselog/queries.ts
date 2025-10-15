@@ -85,3 +85,43 @@ export async function getScenesWithPhrases(client: SupabaseClient, userId: strin
   
     return data;
 }
+
+/**
+ * 'scenes' 테이블에서 특정 scene을 삭제합니다.
+ * @param client - 서버 사이드 Supabase 클라이언트 인스턴스
+ * @param sceneId - 삭제할 scene의 ID
+ * @param userId - 해당 scene의 소유자 ID (보안 확인용)
+ * @returns 삭제 성공 시 null을 반환합니다.
+ */
+export const deleteScene = async (
+  client: SupabaseClient<Database>,
+  sceneId: string,
+  userId: string
+) => {
+  // Phrases가 scenes를 참조하고 있으므로, 먼저 해당 scene에 속한 phrase들을 삭제해야 합니다.
+  // CASCADE 설정이 DB에 되어있다면 이 과정은 불필요할 수 있습니다.
+  const { error: phrasesError } = await client
+    .from("phrases")
+    .delete()
+    .eq("scene_id", sceneId);
+
+  if (phrasesError) {
+    console.error("Error deleting phrases for scene:", phrasesError);
+    throw phrasesError;
+  }
+
+  // 이제 scene을 삭제합니다.
+  const { error: sceneError } = await client
+    .from("scenes")
+    .delete()
+    .eq("id", sceneId)
+    .eq("user_id", userId);
+
+  if (sceneError) {
+    console.error("Error deleting scene:", sceneError);
+    throw sceneError;
+  }
+
+  return null;
+};
+

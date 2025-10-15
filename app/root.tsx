@@ -125,7 +125,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useRouteLoaderData("root");
   return (
     <ThemeProvider
-      specifiedTheme={data?.theme ?? "dark"} // Default to dark theme if none is specified
+      specifiedTheme={"light"} // Default to dark theme if none is specified
       themeAction="/api/settings/theme" // API endpoint for changing theme
     >
       <InnerLayout>{children}</InnerLayout>
