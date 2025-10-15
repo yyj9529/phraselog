@@ -44,11 +44,24 @@ import { Dialog } from "./core/components/ui/dialog";
 import { Sheet } from "./core/components/ui/sheet";
 import i18next from "./core/lib/i18next.server";
 import { themeSessionResolver } from "./core/lib/theme-session.server";
+import type { Theme } from "./core/lib/theme";
 import { cn } from "./core/lib/utils";
 import NotFound from "./core/screens/404";
 
 export const links: Route.LinksFunction = () => [
-  { rel: "icon", href: "/favicon.ico" },
+  { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+  {
+    rel: "icon",
+    type: "image/png",
+    sizes: "96x96",
+    href: "/favicon-96x96.png",
+  },
+  {
+    rel: "apple-touch-icon",
+    sizes: "180x180",
+    href: "/apple-touch-icon.png",
+  },
+  { rel: "manifest", href: "/site.webmanifest" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -125,7 +138,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const data = useRouteLoaderData("root");
   return (
     <ThemeProvider
-      specifiedTheme={"light"} // Default to dark theme if none is specified
+      specifiedTheme={data?.theme as Theme}
       themeAction="/api/settings/theme" // API endpoint for changing theme
     >
       <InnerLayout>{children}</InnerLayout>

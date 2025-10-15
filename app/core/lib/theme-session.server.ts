@@ -11,6 +11,7 @@
  */
 import { createCookieSessionStorage } from "react-router";
 import { createThemeSessionResolver } from "remix-themes";
+import { Theme } from "./theme";
 
 /**
  * Cookie-based session storage for theme preferences
