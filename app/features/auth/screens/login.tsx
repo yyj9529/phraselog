@@ -78,7 +78,7 @@ const loginSchema = z.object({
  * @returns Validation errors, auth errors, or redirect on success
  */
 export async function action({ request }: Route.ActionArgs) {
-  console.log("request...............",request);
+  
   // Parse form data from the request
   const formData = await request.formData();
   const {
@@ -154,10 +154,10 @@ export default function Login({ actionData }: Route.ComponentProps) {
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold">
-            Sign into your account
+            로그인
           </CardTitle>
           <CardDescription className="text-base">
-            Please enter your details
+            로그인 정보를 입력해주세요.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -171,14 +171,14 @@ export default function Login({ actionData }: Route.ComponentProps) {
                 htmlFor="email"
                 className="flex flex-col items-start gap-1"
               >
-                Email
+                이메일
               </Label>
               <Input
                 id="email"
                 name="email"
                 required
                 type="email"
-                placeholder="i.e nico@supaplate.com"
+                placeholder="i.e jessica@gmail.com"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -192,7 +192,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
                   htmlFor="password"
                   className="flex flex-col items-start gap-1"
                 >
-                  Password
+                  비밀번호
                 </Label>
                 <Link
                   to="/auth/forgot-password/reset"
@@ -200,7 +200,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
                   tabIndex={-1}
                   viewTransition
                 >
-                  Forgot your password?
+                  비밀번호를 잊어버리셨나요?
                 </Link>
               </div>
               <Input
@@ -217,20 +217,20 @@ export default function Login({ actionData }: Route.ComponentProps) {
                 <FormErrors errors={actionData.fieldErrors.password} />
               ) : null}
             </div>
-            <FormButton label="Log in" className="w-full" />
+            <FormButton label="로그인" className="w-full" />
             {actionData && "error" in actionData ? (
               actionData.error === "Email not confirmed" ? (
                 <Alert variant="destructive" className="bg-destructive/10">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Email not confirmed</AlertTitle>
+                  <AlertTitle>이메일 인증이 완료되지 않았습니다.</AlertTitle>
                   <AlertDescription className="flex flex-col items-start gap-2">
-                    Before signing in, please verify your email.
+                    로그인 전, 이메일 인증을 완료해주세요.
                     <Button
                       variant="outline"
                       className="text-foreground flex items-center justify-between gap-2"
                       onClick={onResendClick}
                     >
-                      Resend confirmation email
+                      이메일 인증 이메일 재전송
                       {fetcher.state === "submitting" ? (
                         <Loader2Icon
                           data-testid="resend-confirmation-email-spinner"
@@ -250,14 +250,14 @@ export default function Login({ actionData }: Route.ComponentProps) {
       </Card>
       <div className="flex flex-col items-center justify-center text-sm">
         <p className="text-muted-foreground">
-          Don't have an account?{" "}
+          계정이 없으신가요?{" "}
           <Link
             to="/join"
             viewTransition
             data-testid="form-signup-link"
             className="text-muted-foreground hover:text-foreground text-underline underline transition-colors"
           >
-            Sign up
+            회원가입
           </Link>
         </p>
       </div>

@@ -48,20 +48,20 @@ function UserMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem asChild>
+        {/* <DropdownMenuItem asChild>
           <SheetClose asChild>
             <Link to="/dashboard" viewTransition>
               <HomeIcon className="size-4" />
               Dashboard
             </Link>
           </SheetClose>
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
         
         <DropdownMenuItem asChild>
           <SheetClose asChild>
             <Link to="/logout" viewTransition>
               <LogOutIcon className="size-4" />
-              Log out
+             로그아웃
             </Link>
           </SheetClose>
         </DropdownMenuItem>
@@ -76,7 +76,7 @@ function AuthButtons() {
       <Button variant="ghost" asChild>
         <SheetClose asChild>
           <Link to="/login" viewTransition>
-            Sign in
+            로그인
           </Link>
         </SheetClose>
       </Button>
@@ -84,7 +84,7 @@ function AuthButtons() {
       <Button variant="default" asChild>
         <SheetClose asChild>
           <Link to="/join" viewTransition>
-            Sign up
+           회원가입
           </Link>
         </SheetClose>
       </Button>
@@ -138,11 +138,11 @@ export function NavigationBar({
             </Link>
           )}
           
-          <Separator orientation="vertical" />
+          {/* <Separator orientation="vertical" />
           
           <Actions />
           
-          <Separator orientation="vertical" />
+          <Separator orientation="vertical" /> */}
           
           {loading ? (
             <div className="flex items-center">

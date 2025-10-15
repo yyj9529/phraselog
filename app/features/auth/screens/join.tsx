@@ -187,10 +187,10 @@ export default function Join({ actionData }: Route.ComponentProps) {
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold" role="heading">
-            Create an account
+           회원가입
           </CardTitle>
           <CardDescription className="text-base">
-            Enter your details to create an account
+            회원가입 정보를 입력해주세요.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -201,14 +201,14 @@ export default function Join({ actionData }: Route.ComponentProps) {
           >
             <div className="flex flex-col items-start space-y-2">
               <Label htmlFor="name" className="flex flex-col items-start gap-1">
-                Name
+                이름
               </Label>
               <Input
                 id="name"
                 name="name"
                 required
                 type="text"
-                placeholder="Nico"
+                placeholder="Jessica"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -221,14 +221,14 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 htmlFor="email"
                 className="flex flex-col items-start gap-1"
               >
-                Email
+                이메일
               </Label>
               <Input
                 id="email"
                 name="email"
                 required
                 type="email"
-                placeholder="nico@supaplate.com"
+                placeholder="jessica@gmail.com"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -241,7 +241,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 htmlFor="password"
                 className="flex flex-col items-start gap-1"
               >
-                Password
+                비밀번호
                 <small className="text-muted-foreground">
                   Must be at least 8 characters.
                 </small>
@@ -264,7 +264,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 htmlFor="confirmPassword"
                 className="flex flex-col items-start gap-1"
               >
-                Confirm password
+                비밀번호 확인
               </Label>
               <Input
                 id="confirmPassword"
@@ -279,7 +279,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 <FormErrors errors={actionData.fieldErrors.confirmPassword} />
               ) : null}
             </div>
-            <FormButton label="Create account" className="w-full" />
+            <FormButton label="회원가입" className="w-full" />
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors errors={[actionData.error]} />
             ) : null}
@@ -294,7 +294,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
               <Checkbox id="terms" name="terms" checked />
               <Label htmlFor="terms" className="text-muted-foreground">
                 <span>
-                  I have read and agree to the{" "}
+                  서비스 이용약관 및 개인정보 처리방침에 동의합니다.{" "}
                   <Link
                     to="/legal/terms-of-service"
                     viewTransition
@@ -321,7 +321,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 />
                 <AlertTitle>Account created!</AlertTitle>
                 <AlertDescription className="text-green-700 dark:text-green-600">
-                  Before you can sign in, please verify your email. You can
+                  회원가입이 완료되었습니다. 이메일 인증을 완료해주세요. 이 탭을 닫을 수 있습니다.
                   close this tab.
                 </AlertDescription>
               </Alert>
@@ -332,14 +332,14 @@ export default function Join({ actionData }: Route.ComponentProps) {
       </Card>
       <div className="flex flex-col items-center justify-center text-sm">
         <p className="text-muted-foreground">
-          Already have an account?{" "}
+          이미 계정이 있으신가요?{" "}
           <Link
             to="/login"
             viewTransition
             data-testid="form-signin-link"
             className="text-muted-foreground hover:text-foreground text-underline underline transition-colors"
           >
-            Sign in
+            로그인
           </Link>
         </p>
       </div>
