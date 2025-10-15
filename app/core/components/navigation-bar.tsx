@@ -1,6 +1,6 @@
 import { CogIcon, HomeIcon, LogOutIcon, MenuIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 import LangSwitcher from "./lang-switcher";
 import ThemeSwitcher from "./theme-switcher";
@@ -114,7 +114,10 @@ export function NavigationBar({
   loading: boolean;
 }) {
   const { t } = useTranslation();
-  
+  const { pathname } = useLocation();
+
+  const isOnLearningPage = pathname === "/phraselog/learning";
+
   return (
     <nav
       className={
@@ -129,13 +132,15 @@ export function NavigationBar({
         <div className="hidden h-full items-center gap-5 md:flex">
         
           {name && (
-            <Link
-              to="/phraselog/learning"
-              viewTransition
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
-              지난 표현 복습하기
-            </Link>
+            <Button asChild variant="default">
+              <Link
+                to={isOnLearningPage ? "/" : "/phraselog/learning"}
+                viewTransition
+                className="rounded-lg px-5 py-2.5 text-sm font-semibold"
+              >
+                {isOnLearningPage ? "새로운 표현 저장하기" : "지난 표현 복습하기"}
+              </Link>
+            </Button>
           )}
           
           {/* <Separator orientation="vertical" />

@@ -67,8 +67,38 @@ export async function action({ request }: Route.ActionArgs) {
     console.log('------------------------------------');
     // --- 여기까지 추가 ---
 
-    const aiResponseJson = JSON.parse(aiResponse);
-    console.log('🎉 JSON 파싱 완료:', aiResponseJson);
+    // AI가 보낸 원본 데이터를 먼저 확인하기 위한 로그입니다.
+    console.log("Raw content from AI:", aiResponse);
+
+    // content가 문자열이 아닐 경우를 대비해 안전하게 문자열로 변환합니다.
+    const stringContent =
+      typeof aiResponse === "string" ? aiResponse : JSON.stringify(aiResponse);
+
+    // 문자열에서 ```json 과 ``` 부분을 제거하여 순수한 JSON 데이터만 남깁니다.
+    const cleanedContent = stringContent
+      .replace(/^```json\s*/, "")
+      .replace(/```$/, "")
+      .trim();
+
+    // 정리된 데이터를 다시 한번 확인하기 위한 로그입니다.
+    console.log("Cleaned content:", cleanedContent);
+
+    let phrases;
+    try {
+      // 정리된 순수 JSON 문자열을 파싱합니다.
+      phrases = JSON.parse(cleanedContent);
+    } catch (error) {
+      // 만약 파싱 중 에러가 발생하면, 에러를 기록하고 앱이 멈추지 않도록 합니다.
+      console.error("Error parsing JSON:", error);
+      return data(
+        { error: "AI로부터 받은 응답을 처리하는 데 실패했습니다." },
+        { status: 500 },
+      );
+    }
+
+    if (!Array.isArray(phrases)) {
+      throw new Error("AI로부터 받은 응답이 배열이 아닙니다.");
+    }
 
     // queries.ts에 정의한 insertScene 함수를 호출합니다.
     const newScene = await insertScene(client, {
@@ -88,7 +118,7 @@ export async function action({ request }: Route.ActionArgs) {
     console.log("aiResponse...............",aiResponse);
     console.log("sceneId...............",newScene.id );
     return data({ 
-      aiResponse: aiResponseJson, 
+      aiResponse: phrases, 
       sceneId: newScene.id 
     }, { headers });
     
