@@ -1,0 +1,142 @@
+import { useLoaderData, data, Link } from "react-router";
+import { useState, useRef, useMemo } from "react";
+import { Button } from "~/core/components/ui/button";
+import html2canvas from 'html2canvas';
+import makeServerClient from "~/core/lib/supa-client.server";
+import type { Route } from ".react-router/types/app/features/phraselog/screens/+types/showcase.tsx";
+
+// Type definitions
+type Phrase = {
+  id: string;
+  english_phrase: string;
+  explanation: string;
+  example: { en: string; ko:string } | null;
+};
+type Scene = {
+  id: string;
+  my_intention: string;
+  to_who: string;
+  the_context: string;
+  desired_nuance: string | null;
+  phrases: Phrase[];
+};
+type CoachingObject = {
+  explanation: string;
+  cultural_context: string;
+  strategic_advice: string;
+};
+
+// Loader Function: The Single Source of Truth
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const [client, headers] = makeServerClient(request);
+  const { data: { user } } = await client.auth.getUser();
+  const sceneId = params.sceneId;
+
+  if (!user || !sceneId) {
+    throw new Response("Unauthorized or Not Found", { status: 404 });
+  }
+
+  const { data: sceneData, error } = await client
+    .from('scenes')
+    .select(`*, phrases(*)` )
+    .eq('id', sceneId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (error || !sceneData) {
+    console.error("Error fetching scene:", error);
+    throw new Response("Scene Not Found", { status: 404 });
+  }
+  
+  return data({ scene: sceneData as Scene }, { headers });
+}
+
+export default function ShowcaseScreen(props: Route.ComponentProps) {
+  const { scene } = props.loaderData;
+  const [theme, setTheme] = useState('light');
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const coaching: CoachingObject | null = useMemo(() => {
+    if (scene && scene.phrases.length > 0 && scene.phrases[0].explanation) {
+      try {
+        return JSON.parse(scene.phrases[0].explanation);
+      } catch (e) {
+        return { explanation: "Coaching tip not available.", cultural_context: "", strategic_advice: "" };
+      }
+    }
+    return null;
+  }, [scene]);
+
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+    try {
+      const canvas = await html2canvas(cardRef.current, { useCORS: true, backgroundColor: null });
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], "phraselog.png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: "My PhraseLog Growth", text: "Check out what I learned!" });
+        } else {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'phraselog.png';
+          link.click();
+        }
+      });
+    } catch (error) {
+      console.error("Sharing failed:", error);
+    }
+  };
+
+  const cardThemes: { [key: string]: string } = {
+    light: 'bg-white text-slate-800',
+    dark: 'bg-gray-800 text-white',
+    gradient: 'bg-gradient-to-br from-blue-500 to-purple-600 text-white',
+  };
+  const cardClasses = `w-full max-w-2xl rounded-2xl shadow-2xl transition-all duration-300 ${cardThemes[theme]}`;
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100 p-4 sm:p-8">
+      <div className="w-full max-w-4xl">
+        <header className="flex justify-end w-full mb-8">
+          <button onClick={handleShare} className="text-base font-semibold text-white bg-slate-700 px-5 py-2.5 rounded-lg hover:bg-slate-600 transition-colors shadow-sm">
+            Share
+          </button>
+        </header>
+
+        <main className="flex justify-center">
+          <div className={cardClasses} ref={cardRef}>
+            <div className="p-8 md:p-10 space-y-6">
+              <div>
+                <p className="text-sm font-semibold tracking-wide opacity-70 mb-2">MY INTENTION</p>
+                <p className="text-base italic opacity-90">"{scene.my_intention}"</p>
+              </div>
+              <div className="border-t border-current border-opacity-10 my-4"></div>
+              <div>
+                <p className="text-sm font-semibold tracking-wide opacity-70 mb-2">PHRASELOG'S SUGGESTION</p>
+                <p className="text-xl md:text-2xl font-bold">"{scene.phrases[0]?.english_phrase || '...'}"</p>
+              </div>
+              {coaching?.explanation && (
+                <div>
+                  <p className="text-sm font-semibold tracking-wide opacity-70 mb-2">THE COACH'S TIP</p>
+                  <p className="text-base opacity-90">{coaching.explanation}</p>
+                </div>
+              )}
+            </div>
+            <div className="text-center border-t border-current border-opacity-10 py-4 px-8">
+              <p className="text-xs font-mono tracking-wider opacity-50">
+                Generated by <span className="font-semibold opacity-80">PhraseLog</span>
+              </p>
+            </div>
+          </div>
+        </main>
+
+        <footer className="flex justify-center space-x-4 mt-12">
+            <button onClick={() => setTheme('light')} className={`w-12 h-12 rounded-full bg-white border-2 transition-all ${theme === 'light' ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}></button>
+            <button onClick={() => setTheme('dark')} className={`w-12 h-12 rounded-full bg-gray-800 border-2 transition-all ${theme === 'dark' ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}></button>
+            <button onClick={() => setTheme('gradient')} className={`w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 border-2 transition-all ${theme === 'gradient' ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-300'}`}></button>
+        </footer>
+      </div>
+    </div>
+  );
+}
