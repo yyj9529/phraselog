@@ -100,6 +100,7 @@ export default [
       route("/ai-result", "features/phraselog/pages/AiResult.tsx"),
       route("/my-phrases", "features/phraselog/pages/MyPhrases.tsx"),
       route("/save-phrase", "features/phraselog/pages/save-phrase.tsx"),
+      route("/showcase/:sceneId", "features/phraselog/screens/showcase.tsx"),
     ]),
   
   ]),

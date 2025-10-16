@@ -2,8 +2,9 @@ import type { Route } from ".react-router/types/app/features/phraselog/screens/+
 import { useLoaderData, Link, data, useFetcher } from "react-router";
 import makeServerClient from "~/core/lib/supa-client.server";
 import { Button } from "~/core/components/ui/button";
-import { useState, useMemo } from "react"; // useMemo 추가
+import { useState, useMemo, useRef } from "react";
 import { Modal } from "~/core/components/ui/modal";
+import React from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,8 +24,9 @@ import {
   PaginationPrevious,
 } from "~/core/components/ui/pagination";
 import { deleteScene } from "../queries";
+import { Share2Icon } from "lucide-react";
+import { toBlob, toPng } from 'html-to-image';
 
-// [추가] Coaching 데이터와 관련된 타입 및 상수 정의 (컴포넌트 외부)
 const coachingCategories = ["설명", "문화적 맥락", "전략적 조언"] as const;
 type Category = typeof coachingCategories[number];
 
@@ -40,11 +42,10 @@ const categoryMap: Record<Category, keyof CoachingObject> = {
   "전략적 조언": "strategic_advice",
 };
 
-// 데이터 타입을 정의합니다.
 type Phrase = {
   id: string;
   english_phrase: string;
-  explanation: string; // 이 필드는 DB에서 온 JSON 문자열입니다.
+  explanation: string;
   example: { en: string; ko: string } | null;
 };
 
@@ -57,13 +58,60 @@ type SceneWithPhrases = {
   phrases: Phrase[];
 };
 
-// --- AI 분석 결과를 보여주는 별도의 컴포넌트 ---
-// [수정] coaching prop은 DB에서 온 문자열이므로 string 타입을 받습니다.
+type ShareableCardData = {
+  phrase: Phrase;
+  scene: SceneWithPhrases;
+} | null;
+
+// Shareable Card Component
+const ShareableCard = React.forwardRef<
+  HTMLDivElement,
+  { data: ShareableCardData }
+>(({ data }, ref) => {
+  if (!data) return null;
+  const { phrase, scene } = data;
+
+  const coaching: CoachingObject = useMemo(() => {
+    try {
+      return JSON.parse(phrase.explanation);
+    } catch {
+      return { explanation: "코칭 내용을 불러올 수 없습니다.", cultural_context: "", strategic_advice: "" };
+    }
+  }, [phrase.explanation]);
+
+  const keyCoachingPoint = coaching.strategic_advice || coaching.cultural_context || coaching.explanation;
+
+  return (
+    <div ref={ref} className="bg-white text-slate-800 p-6 rounded-lg shadow-xl w-[350px] font-sans border">
+      <div className="text-center mb-4">
+        <p className="text-sm text-slate-500 font-semibold">"{scene.my_intention}"</p>
+        <h2 className="text-base font-bold text-blue-600 mt-1">상황에 딱 맞는 AI 코칭 🚀</h2>
+      </div>
+      
+      <div className="bg-slate-50 p-4 rounded-md mb-4 border border-slate-200">
+        <p className="text-lg font-bold text-slate-900">
+          {phrase.english_phrase}
+        </p>
+      </div>
+
+      <div className="mb-2">
+        <h3 className="font-bold text-sm text-slate-600 mb-1">💡 AI's Coaching</h3>
+        <p className="text-sm text-slate-700 bg-blue-50/50 p-3 rounded-md border border-blue-100">
+          {keyCoachingPoint}
+        </p>
+      </div>
+
+      <p className="text-xs text-center font-semibold text-slate-400 mt-4">
+        Powered by PhraseLog
+      </p>
+    </div>
+  );
+});
+ShareableCard.displayName = "ShareableCard";
+
 function AnalysisResult({ coaching }: { coaching: string }) {
-  // [수정] useState의 타입을 Category로 명시적으로 지정합니다.
   const [selectedCategory, setSelectedCategory] = useState<Category>(coachingCategories[0]);
 
-  // [수정] DB에서 받은 JSON 문자열을 파싱합니다.
   const parsedCoaching: CoachingObject = useMemo(() => {
     try {
       if (coaching && typeof coaching === 'string') {
@@ -72,13 +120,11 @@ function AnalysisResult({ coaching }: { coaching: string }) {
     } catch (e) {
       console.error("Coaching JSON 파싱 실패:", e);
     }
-    // 파싱 실패 시 UI 깨짐을 방지하기 위해 기본값을 반환합니다.
     return { explanation: "분석 결과를 불러올 수 없습니다.", cultural_context: "", strategic_advice: "" };
   }, [coaching]);
 
   return (
     <div className="mt-2 p-4 bg-white rounded-lg border border-slate-200 animate-in fade-in-50 space-y-3">
-      {/* Segmented Control */}
       <div className="flex w-full bg-slate-200/60 rounded-lg p-1">
         {coachingCategories.map((category) => (
           <button
@@ -94,17 +140,13 @@ function AnalysisResult({ coaching }: { coaching: string }) {
           </button>
         ))}
       </div>
-
-      {/* Coaching Text */}
       <p className="text-sm text-slate-600 leading-relaxed min-h-[5em]">
-        {/* [수정] 파싱된 객체와 타입이 지정된 맵을 사용하여 안전하게 데이터에 접근합니다. */}
         {parsedCoaching[categoryMap[selectedCategory]] || "내용이 없습니다."}
       </p>
     </div>
   );
 }
 
-// 서버 사이드에서 데이터를 로드하는 loader 함수입니다.
 export async function loader({ request }: Route.LoaderArgs) {
   const [client, headers] = makeServerClient(request);
   const {
@@ -118,20 +160,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     const from = (page - 1) * itemsPerPage;
     const to = from + itemsPerPage - 1;
 
-    // 전체 카운트 가져오기
     const { count, error: countError } = await client
       .from('scenes')
       .select('id, phrases!inner(id)', { count: 'exact', head: true })
       .eq('user_id', user.id);
 
-    console.log("count ......................... ", count);
-    console.log("user.id ......................... ", user.id);
     if (countError) {
       console.error('Error fetching scenes count:', countError);
-      // 에러 처리 로직을 추가할 수 있습니다.
     }
 
-    // 페이지네이션된 데이터 가져오기
     const { data: scenesData, error } = await client
       .from('scenes')
       .select(`
@@ -156,7 +193,6 @@ export async function loader({ request }: Route.LoaderArgs) {
       return data({ scenes: [], totalPages: 0, currentPage: 1 }, { headers });
     }
     
-    // scenesData의 타입을 명시적으로 지정하여 타입 에러를 해결합니다.
     const scenes: SceneWithPhrases[] = (scenesData as any) || [];
     const totalPages = Math.ceil((count || 0) / itemsPerPage);
 
@@ -173,7 +209,6 @@ export async function action({ request }: Route.ActionArgs) {
   } = await client.auth.getUser();
 
   if (!user) {
-    // or handle as an error
     return data({ success: false, error: "Unauthorized" }, { status: 401, headers });
   }
 
@@ -203,7 +238,33 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
   const [openAnalysisId, setOpenAnalysisId] = useState<string | null>(null);
   const [selectedScene, setSelectedScene] = useState<SceneWithPhrases | null>(null);
   const [sceneToDelete, setSceneToDelete] = useState<SceneWithPhrases | null>(null);
+  const [dataToShare, setDataToShare] = useState<ShareableCardData>(null);
   const fetcher = useFetcher();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+    try {
+      const blob = await toBlob(cardRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
+      if (blob && navigator.share) {
+        await navigator.share({
+          files: [new File([blob], 'phraselog-card.png', { type: blob.type })],
+          title: 'PhraseLog Expression',
+          text: 'Check out this expression I learned from PhraseLog!',
+        });
+      } else if (blob) {
+        const dataUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'phraselog-card.png';
+        link.href = dataUrl;
+        link.click();
+        URL.revokeObjectURL(dataUrl);
+      }
+    } catch (err) {
+      console.error('Sharing failed:', err);
+      alert('이미지를 생성하거나 공유하는 데 실패했습니다.');
+    }
+  };
 
   const toggleAnalysis = (phraseId: string) => {
     setOpenAnalysisId(openAnalysisId === phraseId ? null : phraseId);
@@ -214,8 +275,13 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
   };
 
   const openDeleteModal = (scene: SceneWithPhrases, e: React.MouseEvent) => {
-    e.stopPropagation(); // 이벤트 버블링 방지
+    e.stopPropagation();
     setSceneToDelete(scene);
+  };
+  
+  const openShareModal = (phrase: Phrase, scene: SceneWithPhrases, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDataToShare({ phrase, scene });
   };
 
   const closeModal = () => {
@@ -241,7 +307,7 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="px-4 sm:px-6 md:px-12 py-10">
-        <h1 className="text-3xl font-bold text-slate-800">My Learning</h1>
+        <h1 className="text-3xl font-bold text-slate-800">나의 표현 목록</h1>
         <p className="text-base text-slate-500 mt-2">
           저장한 표현들을 복습하고 내 것으로 만들어보세요.
         </p>
@@ -258,14 +324,13 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
                   <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
                     MY SCENE
                   </h2>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-4">
                     <span className="text-xs text-slate-400 cursor-pointer hover:underline" onClick={() => handleSceneClick(scene)}>자세히 보기 &rarr;</span>
                     <button 
                       onClick={(e) => openDeleteModal(scene, e)}
                       className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-full"
                       aria-label="Delete scene"
                     >
-                      {/* 간단한 SVG 휴지통 아이콘 */}
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                     </button>
                   </div>
@@ -284,7 +349,16 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
                 </h3>
                 {scene.phrases.map((phrase) => (
                   <div key={phrase.id} className="border border-slate-200 rounded-xl p-4 transition-shadow hover:shadow-md">
-                    <p className="font-semibold text-blue-600 text-base mb-2">{phrase.english_phrase}</p>
+                    <div className="flex justify-between items-start">
+                      <p className="font-semibold text-blue-600 text-base mb-2 pr-4">{phrase.english_phrase}</p>
+                      <button 
+                        onClick={(e) => openShareModal(phrase, scene, e)}
+                        className="text-slate-400 hover:text-blue-500 transition-colors p-1 rounded-full"
+                        aria-label="Share phrase"
+                      >
+                        <Share2Icon className="w-4 h-4" />
+                      </button>
+                    </div>
                     <div className="mt-2">
                       <button 
                         onClick={() => toggleAnalysis(phrase.id)}
@@ -294,7 +368,6 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
                         <span className={`transform transition-transform duration-200 ${openAnalysisId === phrase.id ? 'rotate-180' : ''}`}>▼</span>
                       </button>
                       {openAnalysisId === phrase.id && (
-                        // 별도로 만든 AnalysisResult 컴포넌트를 사용
                         <AnalysisResult coaching={phrase.explanation} />
                       )}
                     </div>
@@ -338,6 +411,16 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
           </div>
         )}
       </main>
+
+      <Modal isOpen={!!dataToShare} onClose={() => setDataToShare(null)} title="표현 공유하기">
+        <div className="p-4 bg-slate-100 rounded-lg flex justify-center">
+          <ShareableCard ref={cardRef} data={dataToShare} />
+        </div>
+        <div className="mt-6 flex justify-end space-x-3">
+          <Button variant="outline" onClick={() => setDataToShare(null)}>Close</Button>
+          <Button onClick={handleShare}>Share</Button>
+        </div>
+      </Modal>
 
       <Modal isOpen={!!selectedScene} onClose={closeModal} title="Scene Details">
         {selectedScene && (
