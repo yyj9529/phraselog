@@ -59,7 +59,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       provider: parsedParams.provider,
       options: {
         // Set the callback URL for when authentication is complete
-        redirectTo: `${process.env.SITE_URL}/auth/social/complete/${parsedParams.provider}`,
+        // 아래 redirectTo 값을 수정해주세요.
+        redirectTo: `${process.env.SITE_URL}`,
       },
     });
 
