@@ -15,3 +15,5 @@
 
 //     return Response.json({data,error});
 // }
+
+export default function Welcome() {};
