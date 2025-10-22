@@ -92,15 +92,15 @@ function AuthButtons() {
   );
 }
 
-function Actions() {
-  return (
-    <>
-      <ThemeSwitcher />
+// function Actions() {
+//   return (
+//     <>
+//       <ThemeSwitcher />
       
-      <LangSwitcher />
-    </>
-  );
-}
+//       <LangSwitcher />
+//     </>
+//   );
+// }
 
 export function NavigationBar({
   name,
@@ -190,7 +190,7 @@ export function NavigationBar({
               {name ? (
                 <div className="grid grid-cols-3">
                   <div className="col-span-2 flex w-full justify-between">
-                    <Actions />
+                    {/* <Actions /> */}
                   </div>
                   <div className="flex justify-end">
                     <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
@@ -199,7 +199,7 @@ export function NavigationBar({
               ) : (
                 <div className="flex flex-col gap-5">
                   <div className="flex justify-between">
-                    <Actions />
+                    {/* <Actions /> */}
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <AuthButtons />
