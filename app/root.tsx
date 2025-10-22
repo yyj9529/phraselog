@@ -279,7 +279,7 @@ export default function App() {
         navigate(`/error?${searchParams.toString()}`);
       } else if (code) {
         // Redirect to dashboard if authentication succeeded
-        navigate(`/`);
+        navigate(`/dashboard`);
       }
     }
   }, [searchParams]);
