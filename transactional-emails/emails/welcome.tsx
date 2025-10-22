@@ -9,6 +9,20 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
+import { Resend } from "resend";
+
+const client = new Resend(process.env.RESEND_API_KEY);
+
+const loader = async()=>{
+  const {data,error} = await client.emails.send({
+    from : "PhraseLog <wooju@mail.phraselog.online>",
+    to : "garethgates88@gmail.com",
+    subject : "Welcome to Supaplate",
+    html : `<h1>Welcome to Supaplate</h1>`
+  });
+
+  return Response.json({data,error});
+}
 
 export default function Welcome({ profile }: { profile: string }) {
   return (
