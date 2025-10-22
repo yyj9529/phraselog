@@ -61,7 +61,10 @@ export const links: Route.LinksFunction = () => [
     sizes: "180x180",
     href: "/apple-touch-icon.png",
   },
-  { rel: "manifest", href: "/site.webmanifest" },
+  // 1. 기존 site.webmanifest를 manifest.json으로 변경하고, PWA 아이콘 링크를 추가합니다.
+  { rel: "manifest", href: "/manifest.json" },
+  { rel: "apple-touch-icon", href: "/icons/icon-192x192.png" },
+  // 여기까지 추가/수정
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -180,6 +183,12 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* 2. 여기에 PWA 관련 메타 태그들을 추가합니다. */}
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="PhraseLog" />
+        {/* 여기까지 추가 */}
         <Meta />
         <Links />
         {isPreRendered ? (
