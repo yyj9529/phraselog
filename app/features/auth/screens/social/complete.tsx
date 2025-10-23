@@ -66,6 +66,7 @@ const errorSchema = z.object({
  * @returns Redirect to home page with auth cookies or error response
  */
 export async function loader({ request }: Route.LoaderArgs) {
+  console.log("KAKAO DEBUG: complete.tsx 실행됨!");
   // Extract query parameters from the URL
   const { searchParams } = new URL(request.url);
   

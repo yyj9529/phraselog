@@ -189,8 +189,21 @@ export function NavigationBar({
             <SheetFooter>
               {name ? (
                 <div className="grid grid-cols-3">
-                  <div className="col-span-2 flex w-full justify-between">
-                    {/* <Actions /> */}
+                  <div className="col-span-2 flex w-full items-center justify-between">
+                    {/* 여기에 버튼 코드를 추가합니다 */}
+                    <SheetClose asChild>
+                      <Button asChild variant="default">
+                        <Link
+                          to={isOnLearningPage ? "/" : "/phraselog/learning"}
+                          viewTransition
+                          className="rounded-lg px-4 py-2 text-sm font-semibold"
+                        >
+                          {isOnLearningPage
+                            ? "새로운 표현 저장하기"
+                            : "지난 표현 복습하기"}
+                        </Link>
+                      </Button>
+                    </SheetClose>
                   </div>
                   <div className="flex justify-end">
                     <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
