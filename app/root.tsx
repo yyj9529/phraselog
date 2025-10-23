@@ -278,7 +278,7 @@ export default function App() {
         // Redirect to error page if authentication failed
         navigate(`/error?${searchParams.toString()}`);
       } else if (code) {
-          console.log("KAKAO DEBUG: root.tsx의 리디렉션 코드 실행됨!");
+          
         // Redirect to dashboard if authentication succeeded
         navigate(`/`);
       }

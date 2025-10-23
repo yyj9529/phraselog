@@ -26,6 +26,7 @@ import {
 import { deleteScene } from "../queries";
 import { Share2Icon } from "lucide-react";
 import { toBlob, toPng } from 'html-to-image';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/core/components/ui/dialog";
 
 const coachingCategories = ["설명", "문화적 맥락", "전략적 조언"] as const;
 type Category = typeof coachingCategories[number];
@@ -422,46 +423,35 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
         </div>
       </Modal>
 
-      <Modal isOpen={!!selectedScene} onClose={closeModal} title="Scene Details">
-        {selectedScene && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                MY SCENE
-              </h3>
-              <p className="text-slate-700 text-base">
-                <span className="font-semibold">To:</span> {selectedScene.to_who}, <span className="font-semibold">Intention:</span> {selectedScene.my_intention}, <span className="font-semibold">Context:</span> {selectedScene.the_context}
-                {selectedScene.desired_nuance && (
-                  <span className="italic text-slate-600"> ({selectedScene.desired_nuance})</span>
-                )}
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                EXPRESSION EXAMPLES
-              </h3>
-              <div className="space-y-3">
-                {selectedScene.phrases.map((phrase) => (
-                  <div key={phrase.id} className="bg-slate-50 p-4 rounded-lg border space-y-2">
-                    <p className="font-semibold text-blue-600 text-base">{phrase.english_phrase}</p>
-                    
-                    {phrase.example && (
-                      <>
-                        <h4 className="font-bold text-xs text-slate-500 uppercase tracking-wider pt-2">대화 예시</h4>
-                        <div className="text-sm text-slate-700 space-y-1 bg-white p-3 rounded-md border">
-                            <p className="font-semibold">{phrase.example.en}</p>
-                            <p className="text-slate-500 pt-1">{phrase.example.ko}</p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
+      <Dialog
+        open={!!selectedScene}
+        onOpenChange={(isOpen) => !isOpen && setSelectedScene(null)}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>대화 예시</DialogTitle>
+            <DialogDescription>
+              {selectedScene?.my_intention}
+            </DialogDescription>
+          </DialogHeader>
+          
+        
+          {/* 여기에 max-h-[80vh]와 overflow-y-auto를 추가합니다. */}
+          <div className="grid gap-4 py-4 max-h-[80vh] overflow-y-auto">
+            {selectedScene?.phrases.map((phrase) => (
+              <div key={phrase.id} className="rounded-md border p-4">
+                <p className="font-bold">{phrase.english_phrase}</p>
+                <p className="text-sm text-muted-foreground">{phrase.explanation}</p>
+                <div className="mt-2 text-xs">{phrase.example?.en || phrase.example?.ko}</div>
               </div>
-            </div>
+            ))}
           </div>
-        )}
-      </Modal>
+          
+          <DialogFooter>
+            <Button onClick={() => setSelectedScene(null)}>닫기</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!sceneToDelete} onOpenChange={(open) => !open && setSceneToDelete(null)}>
         <AlertDialogContent>
