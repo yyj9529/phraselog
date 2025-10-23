@@ -429,88 +429,56 @@ export default function LearningScreen(loaderData: Route.ComponentProps) {
       >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>대화 예시</DialogTitle>
+            <DialogTitle>대화 시뮬레이션</DialogTitle>
             <DialogDescription>
-              {selectedScene?.my_intention}
+              '{selectedScene?.my_intention}' 의도를 전달하기 위한 대화 예시입니다.
             </DialogDescription>
           </DialogHeader>
-          
-          {/* 스크롤을 위한 외부 컨테이너 추가 */}
+
           <div className="max-h-[60vh] overflow-y-auto pr-4">
-            <div className="grid gap-4 py-4">
-              {selectedScene?.phrases.map((phrase) => {
-                // AI가 보내준 JSON 데이터를 파싱하기 위한 타입 정의
-                type ExplanationContent = {
-                  explanation: string;
-                  cultural_context: string;
-                  strategic_advice: string;
-                };
+            <div className="space-y-6 py-4">
+              {/* Scene Context Box */}
+              <div className="rounded-lg border bg-slate-50 p-4 dark:bg-slate-800/50">
+                <h3 className="font-bold text-slate-700 dark:text-slate-300">My Scene</h3>
+                <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                  <p><span className="font-semibold text-slate-600 dark:text-slate-400">To:</span> {selectedScene?.to_who}</p>
+                  <p><span className="font-semibold text-slate-600 dark:text-slate-400">Context:</span> {selectedScene?.the_context}</p>
+                  {selectedScene?.desired_nuance && <p><span className="font-semibold text-slate-600 dark:text-slate-400">Nuance:</span> {selectedScene?.desired_nuance}</p>}
+                </div>
+              </div>
 
-                let content: ExplanationContent | null = null;
-                try {
-                  // 데이터베이스에서 온 텍스트를 JSON 객체로 안전하게 변환
-                  if (phrase.explanation) {
-                    content = JSON.parse(phrase.explanation);
-                  }
-                } catch (error) {
-                  console.error("Error parsing phrase explanation:", error);
-                }
-
-                return (
-                  // 각 카드를 명확하게 구분하는 컨테이너
-                  <div key={phrase.id} className="space-y-4 rounded-lg border bg-slate-50 p-4 dark:bg-slate-800/50">
-                    
-                    {/* 1. 핵심 영어 표현 */}
-                    <blockquote className="border-l-4 border-slate-300 pl-4 italic dark:border-slate-600">
-                      <p className="text-base font-semibold text-slate-800 dark:text-slate-200">
-                        "{phrase.english_phrase}"
-                      </p>
-                    </blockquote>
-
-                    {/* 2. AI 코칭 내용 (섹션별로 구분) */}
-                    {content ? (
-                      <div className="space-y-4 text-sm">
-                        <div>
-                          <h3 className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
-                            <span role="img" aria-label="magnifying glass">🧐</span>
-                            <span>의미 분석 (Explanation)</span>
-                          </h3>
-                          <p className="mt-1 leading-relaxed text-muted-foreground">{content.explanation}</p>
-                        </div>
-
-                        <div>
-                          <h3 className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
-                            <span role="img" aria-label="globe">🌎</span>
-                            <span>문화적 맥락 (Cultural Context)</span>
-                          </h3>
-                          <p className="mt-1 leading-relaxed text-muted-foreground">{content.cultural_context}</p>
-                        </div>
-
-                        <div>
-                          <h3 className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
-                            <span role="img" aria-label="light bulb">💡</span>
-                            <span>전략적 조언 (Strategic Advice)</span>
-                          </h3>
-                          <p className="mt-1 leading-relaxed text-muted-foreground">{content.strategic_advice}</p>
-                        </div>
+              {/* Conversation Examples */}
+              <div className="space-y-6">
+                {selectedScene?.phrases.map((phrase, index) => (
+                  <div key={phrase.id} className="space-y-3">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">AI 추천 표현 #{index + 1}</h4>
+                    <div className="flex items-start gap-3">
+                      {/* Speaker Avatar (e.g., '나') */}
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">
+                        나
                       </div>
-                    ) : (
-                      // JSON 파싱 실패 시, 원본 텍스트를 그대로 보여줌
-                      <p className="text-sm text-muted-foreground">{phrase.explanation}</p>
-                    )}
-
-                    {/* 3. 대화 예시 (명확하게 구분) */}
+                      {/* Chat Bubble */}
+                      <div className="relative flex-1 rounded-lg rounded-bl-none bg-blue-100 p-3 dark:bg-blue-900/50">
+                        <p className="text-base text-slate-800 dark:text-slate-200">{phrase.english_phrase}</p>
+                      </div>
+                    </div>
+                    {/* Example sentences if they exist */}
                     {(phrase.example?.en || phrase.example?.ko) && (
-                      <div className="border-t border-slate-200 pt-3 dark:border-slate-700">
-                        <p className="text-xs font-semibold text-slate-500">대화 예시:</p>
-                        <p className="mt-1 text-sm italic text-slate-600 dark:text-slate-400">
-                          {phrase.example?.en || phrase.example?.ko}
-                        </p>
+                      <div className="flex items-start gap-3 pl-11">
+                          <div className="relative flex-1 rounded-lg border bg-slate-100 p-3 dark:bg-slate-800">
+                              <p className="text-xs font-semibold text-slate-500">대화 예시:</p>
+                              <p className="mt-1 text-sm italic text-slate-600 dark:text-slate-400">
+                                {phrase.example.en}
+                              </p>
+                              <p className="mt-1 text-sm italic text-slate-500 dark:text-slate-500">
+                                ({phrase.example.ko})
+                              </p>
+                          </div>
                       </div>
                     )}
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
           </div>
           
