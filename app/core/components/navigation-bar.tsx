@@ -168,7 +168,7 @@ export function NavigationBar({
           <MenuIcon />
         </SheetTrigger>
         <SheetContent>
-          <SheetHeader>
+          {/* <SheetHeader>
             <SheetClose asChild>
               <Link to="/phraselog">PhraseLog</Link>
             </SheetClose>
@@ -180,7 +180,7 @@ export function NavigationBar({
             <SheetClose asChild>
               <Link to="/contact">Contact</Link>
             </SheetClose>
-          </SheetHeader>
+          </SheetHeader> */}
           {loading ? (
             <div className="flex items-center">
               <div className="bg-muted-foreground h-4 w-24 animate-pulse rounded-full" />
