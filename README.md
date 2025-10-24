@@ -4,30 +4,30 @@
 
 <h2 align="center">PhraseLog</h2>
 <p align="center">
-  실전 영어 표현을 위한 AI 코치 ✨
+  Your AI-Powered Coach for Real-World English Expressions ✨
   <br>
   <a href="https://phraselog.online/"><strong>🌐 Live Website</strong></a> •
   <a href="https://github.com/yyj9529/phraselog"><strong>📦 GitHub Repository</strong></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/React_Router-v7-blue?logo=reactrouter" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-v4-blue?logo=tailwindcss" />
-  <img src="https://img.shields.io/badge/Vite-5.x-blue?logo=vite" />
-  <img src="https://img.shields.io/badge/Supabase-Backend-brightgreen?logo=supabase" />
-  <img src="https://img.shields.io/badge/Drizzle-ORM-lightgrey?logo=drizzle" />
-  <img src="https://img.shields.io/badge/Gemini-AI-blue?logo=google" />
+  <img src="https://img.shields.io/badge/React_Router-v7-blue?logo=reactrouter" alt="React Router v7" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4-blue?logo=tailwindcss" alt="Tailwind CSS v4" />
+  <img src="https://img.shields.io/badge/Vite-5.x-blue?logo=vite" alt="Vite 5.x" />
+  <img src="https://img.shields.io/badge/Supabase-Backend-brightgreen?logo=supabase" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Drizzle-ORM-lightgrey?logo=drizzle" alt="Drizzle ORM" />
+  <img src="https://img.shields.io/badge/Gemini-AI-blue?logo=google" alt="Google Gemini" />
 </p>
 
 ---
 
 ## ✨ What is PhraseLog?
 
-PhraseLog는 단순 번역기를 넘어, **상황(Context)·의도(Intention)·뉘앙스(Nuance)**를 이해하는 AI를 통해 실제 대화에서 사용할 수 있는 자연스러운 영어 표현을 코칭해주는 서비스입니다. 답답했던 언어의 장벽을 자신감으로 바꾸는 경험을 제공합니다.
+PhraseLog is more than just a translator; it's an AI-powered coach that helps you master natural, real-world English expressions. By understanding the **Context, Intention, and Nuance** of your situation, PhraseLog provides tailored suggestions, turning moments of language frustration into confident growth experiences.
 
--   **Scene Builder:** 내가 겪었던 구체적인 상황을 설명하면, AI가 그에 맞는 최적의 표현을 생성합니다.
--   **AI Coaching & PhraseCard:** 생성된 표현을 '나의 표현 노트'에 저장하고, 심층적인 AI 분석(의미, 문화, 전략)을 통해 학습하고 내 것으로 만듭니다.
--   **Conversation Simulation:** 저장된 Scene을 바탕으로, 추천 표현들이 실제 대화에서 어떻게 사용되는지 시뮬레이션으로 보여줍니다.
+-   **Scene Builder:** Describe a real-life communication challenge, and our AI will generate the perfect expressions for that specific scenario.
+-   **AI Coaching & PhraseCards:** Save generated expressions to your personalized phrasebook. Dive deep into each phrase with AI-powered analysis covering its meaning, cultural context, and strategic advice.
+-   **Conversation Simulation:** See how your saved expressions are used in realistic dialogues, helping you internalize the tone and flow of the conversation.
 
 ## 🧩 Tech Stack
 
@@ -42,29 +42,29 @@ PhraseLog는 단순 번역기를 넘어, **상황(Context)·의도(Intention)·�
 
 ## 📈 Project Highlights
 
--   **Production-Ready SaaS:** 실제 운영 중인 서비스([phraselog.online](https://phraselog.online/))로, 인증, 결제, 자동화 등 풀스택 기능을 모두 구현했습니다.
--   **Modern Frontend:** React Router v7의 서버 사이드 렌더링(SSR)을 도입하여 초기 로딩 성능을 최적화했습니다.
--   **Mobile First & PWA:** 모바일 환경에 최적화된 반응형 UI를 구현했으며, PWA 기술을 적용하여 앱과 같은 사용자 경험을 제공합니다.
--   **Type Safety:** TypeScript와 Drizzle ORM을 통해 프론트엔드부터 데이터베이스까지 타입 안정성을 확보했습니다.
+-   **Production-Ready SaaS:** A fully functional, live application available at [phraselog.online](https://phraselog.online/), complete with authentication, subscription payments, and automated features.
+-   **Modern Frontend Architecture:** Built with React Router v7's Server-Side Rendering (SSR) capabilities for optimized initial load performance.
+-   **Mobile First & PWA:** Features a responsive, mobile-first UI and is built as a Progressive Web App (PWA) to provide a native app-like experience.
+-   **End-to-End Type Safety:** Ensures robustness and maintainability with TypeScript on the frontend and Drizzle ORM for type-safe database queries.
 
 ## 📸 Screenshots
 
 <p align="center">
-  <strong>1. 장면 기록 (Scene Input)</strong><br>
+  <strong>1. Scene Input</strong><br>
   <img src="./docs/screenshot_scene_input.png" width="80%" alt="Scene Input" />
 </p>
 <p align="center">
-  <strong>2. 표현 목록 및 AI 분석 (Expression List & Analysis)</strong><br>
+  <strong>2. Expression List & AI Analysis</strong><br>
   <img src="./docs/screenshot_expression_list.png" width="80%" alt="Expression List and Analysis" />
 </p>
 <p align="center">
-  <strong>3. 대화 시뮬레이션 (Conversation Simulation)</strong><br>
+  <strong>3. Conversation Simulation</strong><br>
   <img src="./docs/screenshot_dialog_simulation.png" width="80%" alt="Dialog Simulation" />
 </p>
 
 ## 🧑‍💻 Developed by
 
-**이우주 (WooJu Lee)** — Full Stack Developer
+**WooJu Lee** — Full Stack Developer
 
 -   **Email:** garethgates88@gmail.com
 -   **LinkedIn:** [linkedin.com/in/wooju-lee](https://www.linkedin.com/in/wooju-lee-334b98192/)
