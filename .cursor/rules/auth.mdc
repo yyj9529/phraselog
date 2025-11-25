@@ -1,0 +1,29 @@
+---
+description: Reference for authentication (Login, Join, Profile, RLS).
+globs: app/features/auth/**/*, app/features/users/**/*
+---
+
+# Auth & User Feature
+
+## 1. Routes & Screens
+- **Login:** `/auth/login` (`app/features/auth/screens/login.tsx`)
+- **Join:** `/auth/join` (`app/features/auth/screens/join.tsx`)
+- **Callback:** `/auth/callback` (Supabase Auth Redirect)
+
+## 2. Schema (Database)
+- **Table:** `profiles` (`app/features/users/schema.ts`)
+- **Relation:** `auth.users` (Supabase Managed) -> `profiles.profile_id` (1:1)
+- **Fields:**
+  - `profile_id`: UUID (PK, FK to auth.users)
+  - `name`: Text
+  - `avatar_url`: Text
+  - `marketing_consent`: Boolean
+  - `created_at`, `updated_at`
+
+## 3. Auth Flow
+- **Supabase SSR:** Uses `makeServerClient` to verify auth state server-side.
+- **RLS (Row Level Security):** Users can only `select`, `update`, or `delete` their own profile.
+
+## 4. Key Files
+- `app/core/lib/supa-client.server.ts`: Supabase Server Client factory.
+- `app/features/users/schema.ts`: DB Schema definition.

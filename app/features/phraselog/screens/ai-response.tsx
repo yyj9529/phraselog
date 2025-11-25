@@ -26,6 +26,7 @@ interface AIResponseScreenProps {
   onSave: (expressions: AIExpression[], sceneId: string) => void;
   onRegenerate: () => void;
   isLoading?: boolean;
+  isSaving?: boolean; // [추가] 저장 중 상태 Prop
 }
 
 export function AIResponseScreen({ 
@@ -34,7 +35,8 @@ export function AIResponseScreen({
     scene,
     onSave, 
     onRegenerate,
-    isLoading = false 
+    isLoading = false,
+    isSaving = false // [추가] 기본값 false
 }: AIResponseScreenProps) {
 
     const [selectedExpressions, setSelectedExpressions] = useState<AIExpression[]>([]);
@@ -113,10 +115,15 @@ export function AIResponseScreen({
               <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 flex items-center justify-center gap-4">
                 <Button
                   onClick={handleSaveSelected}
-                  disabled={selectedExpressions.length === 0 || isLoading}
+                  // [수정] 저장 중이거나 로딩 중이면 클릭 방지
+                  disabled={selectedExpressions.length === 0 || isLoading || isSaving}
                   className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-4 text-base font-semibold disabled:bg-slate-300"
                 >
-                  {selectedExpressions.length > 0 ? `${selectedExpressions.length}개 표현 저장하기` : '표현을 선택해주세요'}
+                  {/* [수정] 상태에 따른 텍스트 변경 */}
+                  {isSaving 
+                    ? "저장 중..." 
+                    : (selectedExpressions.length > 0 ? `${selectedExpressions.length}개 표현 저장하기` : '표현을 선택해주세요')
+                  }
                 </Button>
                 <Button
                   onClick={onRegenerate}

@@ -4,7 +4,7 @@
   "type": "module",
   "version": "1.0",
   "scripts": {
-    "prebuild": "npm run typecheck && npm run db:typegen",
+    "prebuild": "npm run typecheck",
     "build": "react-router build",
     "dev2": "cross-env NODE_OPTIONS='--import ./instrument.server.mjs' react-router dev",
     "dev": "react-router dev",
@@ -35,7 +35,7 @@
     "@react-router/serve": "^7.5.1",
     "@sentry/browser": "^9.6.1",
     "@sentry/profiling-node": "^9.10.1",
-    "@sentry/react-router": "^9.10.1",
+    "@sentry/react-router": "^9.46.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
     "@tosspayments/tosspayments-sdk": "^2.3.4",

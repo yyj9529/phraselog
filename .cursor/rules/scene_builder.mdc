@@ -1,0 +1,28 @@
+---
+description: Reference for SceneBuilder logic (Input -> AI Generation -> Save).
+globs: app/features/phraselog/pages/create-scene.tsx, app/features/phraselog/schema.ts, app/features/phraselog/hooks/use-phrases.ts
+---
+
+# SceneBuilder Feature
+
+## 1. Route & Action
+- **Path:** `/phraselog/create-scene` (`app/features/phraselog/pages/create-scene.tsx`)
+- **Method:** POST (Form Submission)
+
+## 2. Core Logic (Flow)
+1.  **Input Validation:** Zod Schema (`intention`, `context`, `to_who`, `nuances`).
+2.  **AI Generation:** `callGemini(prompt)` in `app/features/phraselog/hooks/use-phrases.ts`.
+    - Model: `gemini-2.5-flash-lite`
+    - Response: JSON Array (English Phrase, Explanation, Example).
+3.  **Data Parsing:** Parse JSON & Clean (`cleanedContent`).
+4.  **DB Insert:** `insertScene` (Save Scene) -> `phrases` (Save generated phrases).
+
+## 3. Schema (Database)
+- **Table:** `scenes`
+  - `id`, `user_id`
+  - `my_intention`, `to_who`, `the_context`, `desired_nuance`
+  - `ai_request_prompt_version`
+
+## 4. Key Functions
+- `generatePrompt4_3(...)`: Prompt builder.
+- `callGemini(prompt)`: Google Gemini API wrapper.

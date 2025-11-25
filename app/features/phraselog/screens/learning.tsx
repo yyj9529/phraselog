@@ -23,7 +23,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "~/core/components/ui/pagination";
-import { deleteScene } from "../queries";
+import { deleteScene, getScenes, getScenesCount } from "../queries";
 import { Share2Icon } from "lucide-react";
 import { toBlob, toPng } from 'html-to-image';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "~/core/components/ui/dialog";
@@ -155,45 +155,51 @@ export async function loader({ request }: Route.LoaderArgs) {
   } = await client.auth.getUser();
 
   if (user) {
+    console.log("user...............",user);
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const itemsPerPage = 5;
     const from = (page - 1) * itemsPerPage;
     const to = from + itemsPerPage - 1;
 
-    const { count, error: countError } = await client
-      .from('scenes')
-      .select('id, phrases!inner(id)', { count: 'exact', head: true })
-      .eq('user_id', user.id);
+    // const { count, error: countError } = await client
+    //   .from('scenes')
+    //   .select('id, phrases!inner(id)', { count: 'exact', head: true })
+    //   .eq('user_id', user.id);
 
-    if (countError) {
-      console.error('Error fetching scenes count:', countError);
-    }
+    // if (countError) {
+    //   console.error('Error fetching scenes count:', countError);
+    // }
 
-    const { data: scenesData, error } = await client
-      .from('scenes')
-      .select(`
-        id,
-        my_intention,
-        to_who,
-        the_context,
-        desired_nuance,
-        phrases!inner(
-          id,
-          english_phrase,
-          explanation,
-          example
-        )
-      `)
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .range(from, to);
+    const count = await getScenesCount(client, user.id);
+    console.log("count...............",count);
+    // const { data: scenesData, error } = await client
+    //   .from('scenes')
+    //   .select(`
+    //     id,
+    //     my_intention,
+    //     to_who,
+    //     the_context,
+    //     desired_nuance,
+    //     phrases!inner(
+    //       id,
+    //       english_phrase,
+    //       explanation,
+    //       example
+    //     )
+    //   `)
+    //   .eq('user_id', user.id)
+    //   .order('created_at', { ascending: false })
+    //   .range(from, to);
 
-    if (error) {
-      console.error("Error fetching scenes with phrases:", error);
-      return data({ scenes: [], totalPages: 0, currentPage: 1 }, { headers });
-    }
+    // if (error) {
+    //   console.error("Error fetching scenes with phrases:", error);
+    //   return data({ scenes: [], totalPages: 0, currentPage: 1 }, { headers });
+    // }
     
+    const scenesData = await getScenes(client, user.id, from, to);
+    console.log("scenesData...............",scenesData);
+
     const scenes: SceneWithPhrases[] = (scenesData as any) || [];
     const totalPages = Math.ceil((count || 0) / itemsPerPage);
 

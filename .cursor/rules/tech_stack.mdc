@@ -1,0 +1,36 @@
+---
+description: Reference for Tech Stack, Library Versions, and Conventions.
+globs: 
+---
+
+# Tech Stack & Conventions
+
+## 1. Core Stack
+- **Framework:** React Router v7 (SSR + CSR Hybrid)
+- **Language:** TypeScript
+- **Runtime:** Node.js
+- **Package Manager:** npm
+
+## 2. Frontend
+- **UI Library:** React 19
+- **Styling:** Tailwind CSS v4
+- **Components:** Radix UI (Primitives), Lucide React (Icons)
+- **State Management:** React Context + Hooks (Feature-based)
+- **Form Handling:** Standard React forms / Hooks.
+
+## 3. Backend & Database
+- **BaaS:** Supabase
+- **Auth:** Supabase Auth
+- **Database:** PostgreSQL
+- **ORM:** Drizzle ORM (`drizzle-orm`, `drizzle-kit`)
+- **API Communication:** Supabase Client (`@supabase/supabase-js`)
+
+## 4. Tools & Testing
+- **Bundler:** Vite
+- **E2E Testing:** Playwright
+- **Linting/Formatting:** Prettier
+
+## 5. Directory Structure Convention
+- `app/features/`: Domain-based feature modules (auth, phraselog, users, etc.)
+- `app/core/`: Shared components and utilities.
+- `app/routes/`: Route definitions (React Router v7).

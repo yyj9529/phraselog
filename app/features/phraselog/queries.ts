@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "database.types";
+import { data } from "react-router";
 
 // Supabase가 생성한 타입 정의(database.types.ts)를 활용하여
 // 'scenes' 테이블에 삽입될 데이터의 타입을 가져옵니다.
@@ -125,3 +126,44 @@ export const deleteScene = async (
   return null;
 };
 
+
+export const getScenesCount = async (client: SupabaseClient<Database>, userId: string) => {
+  const { count, error: countError } = await client
+  .from('scenes')
+  .select('id, phrases!inner(id)', { count: 'exact', head: true })
+  .eq('user_id', userId);
+  
+  if (countError) {
+    console.error('Error fetching scenes count:', countError);
+    return 0;
+  }
+  return count;
+}
+
+export const getScenes = async (client: SupabaseClient<Database>, userId: string, from: number, to: number) => {
+  const { data: scenesData, error } = await client
+  .from('scenes')
+  .select(`
+    id,
+    my_intention,
+    to_who,
+    the_context,
+    desired_nuance,
+    phrases!inner(
+      id,
+      english_phrase,
+      explanation,
+      example
+    )
+  `)
+  .eq('user_id', userId)
+  .order('created_at', { ascending: false })
+  .range(from, to);
+
+  if (error) {
+    console.error("Error fetching scenes with phrases:", error);
+    return [];
+  }
+
+  return scenesData;
+}
