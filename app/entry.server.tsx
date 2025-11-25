@@ -18,7 +18,7 @@ import type {
   EntryContext,
   HandleErrorFunction,
 } from "react-router";
-import '../instrument.server.mjs';
+import 'instrument.server.mjs';
 import { createReadableStreamFromReadable } from "@react-router/node";
 import * as Sentry from "@sentry/node";
 import { createInstance } from "i18next";
