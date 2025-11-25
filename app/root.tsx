@@ -61,10 +61,8 @@ export const links: Route.LinksFunction = () => [
     sizes: "180x180",
     href: "/apple-touch-icon.png",
   },
-  // 1. 기존 site.webmanifest를 manifest.json으로 변경하고, PWA 아이콘 링크를 추가합니다.
   { rel: "manifest", href: "/manifest.json" },
   { rel: "apple-touch-icon", href: "/icons/icon-192x192.png" },
-  // 여기까지 추가/수정
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -326,8 +324,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   } else if (error && error instanceof Error) {
     // Handle JavaScript errors
     if (
-      import.meta.env.VITE_SENTRY_DSN &&
-      import.meta.env.MODE === "production"
+      import.meta.env.VITE_SENTRY_DSN
+      //  &&
+      // import.meta.env.MODE === "production"
     ) {
       // Report error to Sentry in production
       Sentry.captureException(error);

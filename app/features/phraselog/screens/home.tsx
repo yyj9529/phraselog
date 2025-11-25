@@ -35,6 +35,7 @@ export default function PhraseLogHome() {
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { phrases } = usePhrases();
+  const [isSaving, setIsSaving] = useState(false); // [추가] 저장 상태 관리
 
 
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ export default function PhraseLogHome() {
 
   const handleSaveExpression = async (expressions: AIExpression[], sceneId: string) => {
     
+    setIsSaving(true); // [추가] 저장 시작 (로딩 ON)
     console.log("Saving expressions:", expressions);
     
     const savePromises = expressions.map(expression => {
@@ -95,11 +97,12 @@ export default function PhraseLogHome() {
       alert("표현 저장 중 오류가 발생했습니다.");
       setAiExpressions(null);
       navigate("/");
+    } finally {
+      setIsSaving(false); // [추가] 저장 완료/실패 시 (로딩 OFF)
     }
   };
 
   const handleRegenerate = () => {
-    console.log("Regenerating...");
     setAiExpressions(null);
   };
 
@@ -115,7 +118,6 @@ export default function PhraseLogHome() {
 
 
   useEffect(() => {
-    console.log("fetcher.data...............",fetcher.data);
     
     setSceneId(fetcher.data?.sceneId ?? null);
     setAiExpressions(fetcher.data?.aiResponse ?? null);
@@ -131,26 +133,14 @@ export default function PhraseLogHome() {
          onSave={handleSaveExpression}
          onRegenerate={handleRegenerate}
          isLoading={isGenerating}
+         isSaving={isSaving} // [추가] 상태 전달
        />
      );
    }
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="px-4 sm:px-6 md:px-12 lg:px-20 py-6 md:py-10">
-        <div className="flex justify-between items-center">
-          {phrases.length > 0 && (
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="rounded-lg px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold"
-            >
-              <span className="hidden sm:inline">+ Add New Scene</span>
-              <span className="sm:hidden">+ 추가</span>
-            </Button>
-          )}
-        </div>
-      </header>
-
+ 
       <main className="px-4 sm:px-6 md:px-12 lg:px-20 my-16">
         {phrases.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[500px] sm:min-h-[600px] max-w-4xl mx-auto">

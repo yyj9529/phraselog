@@ -1,0 +1,28 @@
+---
+description: Reference for Project Goals, MVP Scope, and Core Philosophy.
+globs: 
+---
+
+# Project Brief: PhraseLog
+
+## 1. Core Philosophy
+**Goal:** Transform user's linguistic **Frustration** into a meaningful **Growth Experience**.
+**Approach:** "Radical Simplicity" & "Proof of Value".
+
+## 2. Key Features (MVP)
+1.  **SceneBuilder (Core Differentiator)**
+    - Structured input for communication failures.
+    - Elements: Intention, Context, To Who, Nuances.
+2.  **AI-Powered Coaching**
+    - Beyond translation: Contextual coaching, cultural advice.
+    - Bilingual examples (Prompt v4.3).
+3.  **PhraseLog (Note System)**
+    - Save AI-suggested phrases with the original 'Scene' context.
+    - Turn one-time help into a reusable learning asset.
+4.  **Shareable Cards**
+    - Create stylish image cards for social media sharing.
+
+## 3. Architecture Overview
+- **Frontend:** React (React Router v7)
+- **Backend:** Supabase (Auth, DB)
+- **AI:** Gemini API

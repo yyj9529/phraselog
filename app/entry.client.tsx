@@ -40,7 +40,9 @@ import ko from "./locales/ko";
  */
 async function hydrate() {
   // Initialize Sentry for error monitoring in production environments only
-  if (import.meta.env.VITE_SENTRY_DSN && !import.meta.env.DEV) {
+  if (import.meta.env.VITE_SENTRY_DSN 
+    // && !import.meta.env.DEV
+  ) {
     Sentry.init({
       dsn: import.meta.env.VITE_SENTRY_DSN,
       // Capture all replays for errors

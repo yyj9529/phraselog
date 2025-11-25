@@ -1,0 +1,26 @@
+---
+description: Reference for Phrases Log feature (Saving, Viewing, Learning Status).
+globs: app/features/phraselog/**/*
+---
+
+# Phrases Feature (PhraseLog)
+
+## 1. Schema (Database)
+- **Table:** `phrases`
+  - `scene_id`: FK to `scenes`
+  - `english_phrase`: AI generated phrase
+  - `explanation`: Explanation (Korean)
+  - `example`: JSON (`{ en, ko }`)
+  - `is_saved_by_user`: Saved status (Boolean)
+- **Table:** `learning_progress`
+  - `phrase_id`: FK to `phrases`
+  - `review_count`, `last_reviewed_at`, `is_mastered`
+
+## 2. Components & Pages
+- **List Page:** `MyPhrases.tsx` (View saved phrases)
+- **Card Component:** `phrase-card.tsx` (UI for phrase card)
+- **State Management:** `usePhrases` hook (Local state & API wrapper).
+
+## 3. Key Logic
+- **Saving:** Update `is_saved_by_user: true` when user selects a phrase.
+- **Review:** Manage learning progress via `learning_progress` table.
