@@ -18,12 +18,11 @@ import type {
   EntryContext,
   HandleErrorFunction,
 } from "react-router";
-import 'instrument.server.mjs';
+
 import { createReadableStreamFromReadable } from "@react-router/node";
 import * as Sentry from "@sentry/node";
 import { createInstance } from "i18next";
 import { isbot } from "isbot";
-import { resolve as resolvePath } from "node:path";
 import { PassThrough } from "node:stream";
 import { renderToPipeableStream } from "react-dom/server";
 import { I18nextProvider, initReactI18next } from "react-i18next";
